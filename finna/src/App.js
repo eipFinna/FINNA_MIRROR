@@ -6,17 +6,20 @@ function App() {
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
+        <h1>Téléchargez notre extension web révolutionnaire: Finna !</h1>
         <p>
-          Edit <code>src/App.js</code> and save to reload.
+          Retrouvez les sources de ce que vous lisez! Simple, rapide et efficace.
         </p>
         <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+          className="App-download"
+          href="./extension-finna-test.html"
+          download
         >
-          Learn React
+          <button className="download-button">Télécharger l'extension</button>
         </a>
+        <p className="small-text">
+          Disponible sur Chrome, Firefox, Edge et Safari (je crois).
+        </p>
       </header>
     </div>
   );
