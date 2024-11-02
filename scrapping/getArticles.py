@@ -1,69 +1,33 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import time
+import requests
+import json
+import html2text
 
-def init_driver():
-    options = Options()
-    options.headless = True
-    options.add_argument('--ignore-certificate-errors')
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-    return driver
+url = "https://assets.msn.com/service/news/feed/pages/channelfeed?apikey=0QfOX3Vn51YCzitbLaRkTTBadtWpgTN8NZLW0C1SEM&cm=fr-fr&it=web&memory=8&ocid=social-peregrine&scn=ANON&timeOut=2000&user=m-3D0848EB4F8D67FD322A5DF54EA566BB"
 
-def scrap_yahoo_part_data(driver):
-    driver.get("https://fr.news.yahoo.com/")
-    time.sleep(2)
+urls = []
+for _ in range(5):
+    response = requests.get(url)
+    if response.status_code != 200:
+        break
+    data = response.json()
+    for section in data['sections']:
+        for card in section['cards']:
+            if 'url' in card:
+                urls.append(card['url'])
+                #print(card['title'])
 
-    try:
-        accepter_tout_button = driver.find_element(By.XPATH, "//button[contains(text(), 'Accepter tout')]")
-        accepter_tout_button.click()
-        time.sleep(2)
-    except Exception as e:
-        print("Error clicking 'Accepter tout':", e)
+    if 'nextPageUrl' in data:
+        url = data['nextPageUrl']
+    else:
+        break
 
-    i = 0
-    while i < 20:
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(1)
-        i += 1
+for url in urls:
+    last_part = url.split('/')[-1][3:]
+    Article_Url = "https://assets.msn.com/content/view/v2/Detail/fr-fr/" + last_part
+    response = requests.get(Article_Url)
+    if response.status_code != 200:
+        continue
+    data = response.json()
 
-    all_articles = driver.find_elements(By.CSS_SELECTOR, "li[data-test-locator='stream-item']")
-
-    for article in all_articles:
-        try:
-            publisher = article.find_element(By.CSS_SELECTOR, "span[data-test-locator='stream-item-publisher']").text
-            if publisher == "AFP":
-                title = WebDriverWait(article, 10).until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR, "h3[data-test-locator='stream-item-title']"))
-                )
-                print(title.text)
-
-                a = WebDriverWait(title, 10).until(
-                    EC.element_to_be_clickable((By.TAG_NAME, "a"))
-                )
-                print(a.text)
-
-                # Scroll the element into view
-                driver.execute_script("arguments[0].scrollIntoView(true);", a)
-                time.sleep(1)  # Wait for the scroll action
-
-                # Use JavaScript to click the element
-                driver.execute_script("arguments[0].click();", a)
-                return
-        except Exception as e:
-            print(f"Error processing article: {e}")
-
-def main():
-    driver = init_driver()
-    try:
-        scrap_yahoo_part_data(driver)
-        time.sleep(5)
-    finally:
-        driver.quit()
-
-if __name__ == "__main__":
-    main()
+    print(data['title'] + ", " + data['provider']['name'])
+    #print (html2text.html2text(data['body']))
