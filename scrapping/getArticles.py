@@ -1,16 +1,33 @@
-import asyncio
-from crawl4ai import AsyncWebCrawler
+import requests
+import json
+import html2text
 
-async def main():
-    async with AsyncWebCrawler(verbose=True) as crawler:
-        result = await crawler.arun(
-            url="https://fr.news.yahoo.com/", 
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3", 
-            verbose=True,
-            session_id="business_news_session",
-            only_text=True,
-        )
-        print(result)
+url = "https://assets.msn.com/service/news/feed/pages/channelfeed?apikey=0QfOX3Vn51YCzitbLaRkTTBadtWpgTN8NZLW0C1SEM&cm=fr-fr&it=web&memory=8&ocid=social-peregrine&scn=ANON&timeOut=2000&user=m-3D0848EB4F8D67FD322A5DF54EA566BB"
 
-if __name__ == "__main__":
-    asyncio.run(main())
+urls = []
+for _ in range(5):
+    response = requests.get(url)
+    if response.status_code != 200:
+        break
+    data = response.json()
+    for section in data['sections']:
+        for card in section['cards']:
+            if 'url' in card:
+                urls.append(card['url'])
+                #print(card['title'])
+
+    if 'nextPageUrl' in data:
+        url = data['nextPageUrl']
+    else:
+        break
+
+for url in urls:
+    last_part = url.split('/')[-1][3:]
+    Article_Url = "https://assets.msn.com/content/view/v2/Detail/fr-fr/" + last_part
+    response = requests.get(Article_Url)
+    if response.status_code != 200:
+        continue
+    data = response.json()
+
+    print(data['title'] + ", " + data['provider']['name'])
+    #print (html2text.html2text(data['body']))
