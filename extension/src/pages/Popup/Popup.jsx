@@ -16,6 +16,12 @@ const Popup = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [link, setLink] = useState('');
   const [date, setDate] = useState('');
+  useState(() => {
+    chrome.storage.local.get("selectedText", function (result) {
+      console.log('Value currently is ' + result.selectedText);
+      setInputText(result.selectedText);
+    });
+  }, []);
 
   async function analyseText() {
     setIsLoading(true);
