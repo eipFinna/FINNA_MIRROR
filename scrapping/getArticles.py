@@ -2,19 +2,40 @@ import requests
 import json
 import html2text
 
+# Discord webhook URL
+webhook_url = "https://discord.com/api/webhooks/1305055687755436032/iEB9LeV03w24kgVHZsb5iwM6OfprhTiKmNTWAeGiiyST-59sgtdBV3CZRHBx7p68_V--"
+
+def send_discord_message(message):
+    """Send an error message to a Discord channel using a webhook."""
+    payload = {
+        "content": message + " @everyone"
+    }
+    try:
+        requests.post(webhook_url, json=payload)
+    except requests.exceptions.RequestException as e:
+        print("Failed to send message to Discord:", e)
+
 url = "https://assets.msn.com/service/news/feed/pages/channelfeed?apikey=0QfOX3Vn51YCzitbLaRkTTBadtWpgTN8NZLW0C1SEM&cm=fr-fr&it=web&memory=8&ocid=social-peregrine&scn=ANON&timeOut=2000&user=m-3D0848EB4F8D67FD322A5DF54EA566BB"
 
 urls = []
 for _ in range(5):
-    response = requests.get(url)
-    if response.status_code != 200:
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an exception for HTTP errors
+    except requests.exceptions.RequestException as e:
+        send_discord_message(f"Error fetching channel feed: {e}")
         break
-    data = response.json()
-    for section in data['sections']:
-        for card in section['cards']:
+
+    try:
+        data = response.json()
+    except json.JSONDecodeError as e:
+        send_discord_message(f"Error decoding JSON: {e}")
+        break
+
+    for section in data.get('sections', []):
+        for card in section.get('cards', []):
             if 'url' in card:
                 urls.append(card['url'])
-                #print(card['title'])
 
     if 'nextPageUrl' in data:
         url = data['nextPageUrl']
@@ -23,11 +44,17 @@ for _ in range(5):
 
 for url in urls:
     last_part = url.split('/')[-1][3:]
-    Article_Url = "https://assets.msn.com/content/view/v2/Detail/fr-fr/" + last_part
-    response = requests.get(Article_Url)
-    if response.status_code != 200:
-        continue
-    data = response.json()
+    article_url = f"https://assets.msn.com/content/view/v2/Detail/fr-fr/{last_part}"
 
-    print(data['title'] + ", " + data['provider']['name'])
-    #print (html2text.html2text(data['body']))
+    try:
+        response = requests.get(article_url)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        send_discord_message(f"Error fetching article: {e}")
+        continue
+
+    try:
+        data = response.json()
+        print(data['title'] + ", " + data['provider']['name'])
+    except (json.JSONDecodeError, KeyError) as e:
+        send_discord_message(f"Error parsing article JSON or missing data: {e}")
