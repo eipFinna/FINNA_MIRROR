@@ -24,7 +24,7 @@ test('renders main title "Finna : Votre Extension Révolutionnaire"', () => {
 // Test de la première section "Qu'est-ce que Finna ?"
 test('renders "Qu\'est-ce que Finna ?" section', () => {
   render(<App />);
-  const sectionTitle = screen.getByText(/Qu'est-ce que Finnaaaaa ?/i);
+  const sectionTitle = screen.getByText(/Qu'est-ce que Finna ?/i);
   const sectionText = screen.getByText(/Finna est une extension web conçue pour vous aider à retrouver les sources des informations que vous lisez en ligne/i);
   expect(sectionTitle).toBeInTheDocument();
   expect(sectionText).toBeInTheDocument();
