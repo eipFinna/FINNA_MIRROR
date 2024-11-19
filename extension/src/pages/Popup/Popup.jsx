@@ -1,6 +1,4 @@
 import React from 'react';
-import logo from '../../assets/img/logo.svg';
-import Greetings from '../../containers/Greetings/Greetings';
 import './Popup.css';
 import { useState } from 'react';
 import Typography from '@mui/material/Typography';
@@ -14,12 +12,26 @@ const Popup = () => {
   const [text, setText] = useState('');
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [tmpText, setTmpText] = useState('');
   const [link, setLink] = useState('');
   const [date, setDate] = useState('');
   useState(() => {
+    //put the tmpText in a variable
+    chrome.storage.local.get("tmpText", function (result) {
+      setTmpText(result.tmpText);
+    });
     chrome.storage.local.get("selectedText", function (result) {
-      console.log('Value currently is ' + result.selectedText);
-      setInputText(result.selectedText);
+      if (result.selectedText !== tmpText) {
+        console.log(tmpText)
+        console.log('Value currently is ' + result.selectedText);
+        setInputText(result.selectedText);
+        // set the result.selectedText in the local storage tmpText
+        chrome.storage.local.set({ "tmpText": result.selectedText }, function () {
+          console.log('Value is set to ' + result.selectedText);
+        });
+      } else {
+        setInputText('');
+      }
     });
   }, []);
 
