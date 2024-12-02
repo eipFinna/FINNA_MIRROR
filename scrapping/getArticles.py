@@ -15,6 +15,19 @@ def send_discord_message(message):
     except requests.exceptions.RequestException as e:
         print("Failed to send message to Discord:", e)
 
+def fetch_data(url):
+    """Fetch JSON data from the given URL."""
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        send_discord_message(f"Error fetching data: {e}")
+        raise e
+    except json.JSONDecodeError as e:
+        send_discord_message(f"Error decoding JSON: {e}")
+        raise e
+
 url = "https://assets.msn.com/service/news/feed/pages/channelfeed?apikey=0QfOX3Vn51YCzitbLaRkTTBadtWpgTN8NZLW0C1SEM&cm=fr-fr&it=web&memory=8&ocid=social-peregrine&scn=ANON&timeOut=2000&user=m-3D0848EB4F8D67FD322A5DF54EA566BB"
 
 urls = []
