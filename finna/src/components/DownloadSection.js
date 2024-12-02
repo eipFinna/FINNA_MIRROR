@@ -7,7 +7,7 @@ const DownloadSection = () => {
       <h2>Prêt à essayer Finna ?</h2>
       <p>
         Téléchargez notre extension maintenant et rejoignez une communauté
-        engagée à vérifier les faits.
+        engagée à vérifier les sources.
       </p>
       <a
         href="./extension-finna-test.html"
