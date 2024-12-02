@@ -3,10 +3,10 @@ name: Python Tests Scrapping
 on:
   push:
     branches:
-      - main
+      - scrapping
   pull_request:
     branches:
-      - main
+      - scrapping
 
 jobs:
   test:
