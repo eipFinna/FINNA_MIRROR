@@ -2,6 +2,7 @@ import requests
 import json
 import psycopg2
 from datetime import datetime
+from bs4 import BeautifulSoup
 
 # Establish a connection to the database
 conn = psycopg2.connect('placeholder')
@@ -88,11 +89,20 @@ for url in urls:
     try:
         data = fetch_data(article_url)
         title = data['title']
-        article = data.get('article', '')
+        article = data['body']
         date_str = data.get('publishedDateTime')
         provider = data['provider']['name']
         providerUrl = data['sourceHref']
         print(article_url)
+        cleantext = BeautifulSoup(article, "lxml").text
+
+        # if a row contain the same title and provider, we skip it
+        cur.execute('''
+        SELECT * FROM article_tab WHERE title = %s AND provider = %s
+        ''', (title, provider))
+        if cur.fetchone():
+            print(f"Skipping article: {title}, {provider}")
+            continue
 
         # Convert date string to date object
         if date_str:
@@ -104,7 +114,7 @@ for url in urls:
         cur.execute('''
         INSERT INTO article_tab (title, article, date, url, provider)
         VALUES (%s, %s, %s, %s, %s)
-        ''', (title, article, date_obj, providerUrl, provider))
+        ''', (title, cleantext, date_obj, providerUrl, provider))
 
         print(f"Inserted article: {title}, {provider}")
 
