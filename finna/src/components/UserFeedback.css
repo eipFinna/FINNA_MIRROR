@@ -1,0 +1,48 @@
+.user-feedback-section {
+    padding: 60px 30px;
+    background-color: #f0f8ff;
+    text-align: center;
+  }
+  
+  .user-feedback-section h2 {
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  .user-feedback-section p {
+    margin-bottom: 20px;
+    color: #666;
+  }
+  
+  .feedback-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .feedback-form textarea {
+    width: 100%;
+    max-width: 600px;
+    height: 100px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  
+  .feedback-form .feedback-button {
+    padding: 10px 20px;
+    background-color: #0073e6;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .feedback-form .feedback-button:hover {
+    background-color: #005bb5;
+  }
+  

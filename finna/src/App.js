@@ -4,6 +4,8 @@ import Features from "./components/Features";
 import DownloadSection from "./components/DownloadSection";
 import Footer from "./components/Footer";
 
+import UserFeedback from "./components/UserFeedback";
+
 import Documentation from "./components/Documentation";
 
 import "./App.css";
@@ -17,6 +19,7 @@ function App() {
       <Documentation />
       
       <DownloadSection />
+      <UserFeedback />
       <Footer />
     </div>
   );
