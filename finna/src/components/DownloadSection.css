@@ -1,5 +1,5 @@
 .download-section {
-    padding: 60px 20px;
+    padding: 60px 30px;
     background-color: #e6f7ff;
     text-align: center;
   }
@@ -14,6 +14,10 @@
     font-size: 1.2rem;
     transition: background-color 0.3s;
   }
+
+  .download-section p {
+    margin-bottom: 35px; /*pour espacer le texte du boutton*/
+  }  
   
   .download-button:hover {
     background-color: #005bb5;
