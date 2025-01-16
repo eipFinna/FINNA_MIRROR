@@ -40,6 +40,10 @@ import spacy
 import pytextrank
 from rake_nltk import Rake
 from nltk.corpus import stopwords
+import nltk
+
+# nltk.download('stopwords') # A Décommenter si vous n'avez pas encore téléchargé les stopwords puis recommenter la ligne
+# nltk.download('punkt_tab') # A Décommenter si vous n'avez pas encore téléchargé les stopwords puis recommenter la ligne
 
 # Restaurer la sortie standard après les imports
 sys.stdout = original_stdout
