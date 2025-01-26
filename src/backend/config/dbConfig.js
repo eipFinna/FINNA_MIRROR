@@ -1,11 +1,20 @@
 const { Pool } = require('pg');
+const fs = require('fs');
+const path = require('path');
+
+const configPath = path.join(__dirname, 'dbConfig.json');
+const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 
 const pool = new Pool({
-    host: 'localhost', // localhost
-    user: 'root',
-    password: 'Finna',
-    database: 'Finna_Database',
-    port: 5432,
+    host: config.host,
+    user: config.user,
+    password: config.password,
+    database: config.database,
+    port: config.port,
+    ssl: {
+        rejectUnauthorized: config.ssl.rejectUnauthorized,
+        ca: config.ssl.ca,
+    },
 });
 
 pool.connect((err) => {
