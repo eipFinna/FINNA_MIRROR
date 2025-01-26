@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, Mock
 import requests
 import json
-from getArticles import send_discord_message, fetch_data  # Importez les fonctions à tester
+from scrapers.getArticles import send_discord_message, fetch_data  # Importez les fonctions à tester
 
 class TestScript(unittest.TestCase):
     @patch('getArticles.requests.post')

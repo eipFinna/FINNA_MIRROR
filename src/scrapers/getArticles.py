@@ -48,10 +48,10 @@ def fetch_data(url):
         send_discord_message(f"Error decoding JSON: {e}")
         raise e
 
-url = "https://assets.msn.com/service/news/feed/pages/channelfeed?apikey=0QfOX3Vn51YCzitbLaRkTTBadtWpgTN8NZLW0C1SEM&cm=fr-fr&it=web&memory=8&ocid=social-peregrine&scn=ANON&timeOut=2000&user=m-3D0848EB4F8D67FD322A5DF54EA566BB"
+url = "https://assets.msn.com/service/news/feed/pages/channelfeed?apikey=0QfOX3Vn51YCzitbLaRkTTBadtWpgTN8NZLW0C1SEM&cm=fr-fr&it=web&memory=8&ocid=social-peregrine&scn=ANON&timeOut=2000&user=m-3D0848EB4F8D67FD322A5DF54EA566BB&query=20 Minutes"
 
 urls = []
-for _ in range(50):
+for _ in range(3):
     try:
         response = requests.get(url)
         response.raise_for_status()  # Raise an exception for HTTP errors
