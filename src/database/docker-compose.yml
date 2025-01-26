@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: finna_database
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: Finna
+      POSTGRES_DB: Finna_Database
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./seeds:/var/lib/postgresql/data
+      - ./dbInit.sql:/docker-entrypoint-initdb.d/dbInit.sql
+    user: "${UID}:${GID}"
