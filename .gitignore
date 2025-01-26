@@ -1,1 +1,5 @@
 finna/node_modules
+build
+.venv
+scrapping/__pycache__
+scrapping/.pytest_cache

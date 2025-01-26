@@ -1,0 +1,6 @@
+requests
+html2text
+pytest
+requests-mock
+psycopg2
+bs4
