@@ -1,5 +1,3 @@
-src/frontend/Web/node_modules
-src/frontend/extension/node_modules
 build
 .venv
 scrapping/__pycache__
