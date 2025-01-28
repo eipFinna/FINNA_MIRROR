@@ -1,0 +1,18 @@
+{
+  "name": "finna-server",
+  "version": "1.0.0",
+  "description": "The server of the finna extension",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js"
+  },
+  "author": "Augustin, Rémi, Joris, Lucas",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "mysql2": "^3.10.2",
+    "pg": "^8.13.1"
+  }
+}

@@ -1,0 +1,4 @@
+build
+.venv
+scrapping/__pycache__
+scrapping/.pytest_cache
