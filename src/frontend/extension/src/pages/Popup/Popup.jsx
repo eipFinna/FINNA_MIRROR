@@ -39,9 +39,11 @@ const Popup = () => {
     setIsLoading(true);
     const response = await fetch(`http://localhost:3001/search?q=${inputText}`);
     const json = await response.json();
-    setText(json[0].Body);
-    setLink(json[0].Link);
-    setDate(format(json[0].Date, 'dd/MM/yyyy'));
+    console.log(json);
+    console.log(json.summary);
+    setText(json.summary);
+    setLink(json.articles[0].url);
+    // setDate(format(json[0].Date, 'dd/MM/yyyy'));
     setIsLoading(false);
   }
 
