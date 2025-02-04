@@ -43,7 +43,7 @@ const Popup = () => {
     console.log(json.summary);
     setText(json.summary);
     setLink(json.articles[0].url);
-    // setDate(format(json[0].Date, 'dd/MM/yyyy'));
+    setDate(format(json.articles[0].date, 'dd/MM/yyyy'));
     setIsLoading(false);
   }
 
