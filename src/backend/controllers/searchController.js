@@ -9,6 +9,7 @@ exports.getSummarizedArticles = async (req, res) => {
         const keywords = await aiService.getKeywords(searchTerm);
         console.log("Mots-clés extraits :", keywords);
         const articles = await dbService.searchArticles(keywords);
+        console.log(articles);
         console.log("Articles trouvés :", articles.length);
 
         // Étape 2 : Concaténer les textes des articles
@@ -21,7 +22,7 @@ exports.getSummarizedArticles = async (req, res) => {
         const summary = await aiService.summarizeWithPython(combinedText);
 
         // Étape 4 : Retourner le résumé au client
-        res.json({ summary });
+        res.json({ articles, summary });
         console.log("\n\n\n\nRésumé généré avec succès !\n");
         console.log(summary);
     } catch (error) {
