@@ -7,7 +7,14 @@ const UserFeedback = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    /*pour le backend plus tard*/
+
+    fetch("http://localhost:3001/feedback", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, feedback }),
+    });
     console.log("Feedback soumis :", { email, feedback });
 
     setEmail("");
