@@ -6,6 +6,7 @@ const searchRoutes = require('./routes/searchRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
 
 const app = express();
+require('dotenv').config();
 
 app.use(cors());
 app.use(express.json());

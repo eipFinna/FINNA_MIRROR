@@ -1,12 +1,14 @@
 const axios = require('axios');
 
 // URL du webhook Discord
-const webhookUrl = 'placeholder';
+
 
 exports.postFeedback = async (req, res) => {
     const feedBack = req.body.feedback;
     const email = req.body.email;
+    const webhookUrl = process.env.WEBHOOK_URL;
 
+    console.log(webhookUrl);
     const message = {
         content: 'L\'utilisateur: ' + email + ' nous suggère: ' + feedBack, // Contenu du message
         username: 'FINNA SUGGESTION', // Nom d'utilisateur du bot (optionnel)
