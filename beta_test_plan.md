@@ -6,11 +6,20 @@
 
 ## 1. Selection of Core Functionalities    
 Les fonctionnalités essentielles pour la version bêta de Finna sont :    
-- **Vérification des informations** : L’utilisateur peut soumettre un extrait (article, tweet, etc.), et Finna recherche les sources correspondantes.    
-- **Résumé automatique** : L'IA LLM synthétise les articles trouvés pour en produire un résumé.    
-- **Extension web** : Accès rapide et intégration dans le navigateur.    
-- **Site web** : Landing page pour télécharger l'extension et recueillir des retours d’utilisateurs.    
-- **Scraping et stockage** : Récupération automatisée d'articles via des scripts Python pour alimenter la base de données.  
+- **Vérification des informations** : L’utilisateur peut soumettre un extrait (article, tweet, etc.), et Finna recherche les sources correspondantes.  
+  - **Priorité** : Haute  
+
+- **Résumé automatique** : L'IA LLM synthétise les articles trouvés pour en produire un résumé.  
+  - **Priorité** : Haute  
+
+- **Extension web** : Accès rapide et intégration dans le navigateur.  
+  - **Priorité** : Haute  
+
+- **Site web (landing + feedback)** : Permet de télécharger l'extension et de recueillir des retours.  
+  - **Priorité** : Moyenne  
+
+- **Scraping et stockage** : Scripts Python pour récupérer automatiquement des articles.  
+  - **Priorité** : Moyenne   
 
 ---
 
