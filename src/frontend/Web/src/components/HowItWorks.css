@@ -1,0 +1,18 @@
+.how-it-works {
+    background-color: #F9FAFB;
+    padding: 4rem 1.5rem;
+  }
+  .how-steps {
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  .step h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+  .step p {
+    color: #4B5563;
+  }

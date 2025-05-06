@@ -1,4 +1,4 @@
-.download-section {
+ /* .download-section {
     padding: 60px 30px;
     background-color: #e6f7ff;
     text-align: center;
@@ -16,10 +16,27 @@
   }
 
   .download-section p {
-    margin-bottom: 35px; /*pour espacer le texte du boutton*/
+    margin-bottom: 35px; /*pour espacer le texte du boutton
   }  
   
   .download-button:hover {
     background-color: #005bb5;
+  } */
+
+  .download {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem;
+    text-align: center;
   }
-  
+  .download-button {
+    background-color: #059669;
+    color: #FFF;
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: background-color 0.3s;
+  }
+  .download-button:hover {
+    background-color: #047857;
+  }

@@ -1,4 +1,4 @@
-.footer {
+/* .footer {
     background-color: #333;
     color: white;
     padding: 20px;
@@ -14,4 +14,16 @@
   .footer a:hover {
     text-decoration: underline;
   }
+   */
   
+   .footer {
+    background-color: #FFF;
+    border-top: 1px solid #E5E7EB;
+  }
+  .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    text-align: center;
+    color: #6B7280;
+  }

@@ -3,20 +3,23 @@ import "./Footer.css";
 
 const Footer = () => {
   return (
+    // <footer className="footer">
+    //   <p>© 2024 Finna. Tous droits réservés.</p>
+    //   <p>
+    //     Suivez-nous sur :{" "}
+    //     <a href="https://twitter.com/Finna" target="_blank" rel="noreferrer">
+    //       Twitter
+    //     </a>
+    //     ,{" "}
+    //     <a href="https://instagram.com/Finna" target="_blank" rel="noreferrer">
+    //       Instagram
+    //     </a>
+    //     .
+    //   </p>
+    // </footer>
     <footer className="footer">
-      <p>© 2024 Finna. Tous droits réservés.</p>
-      <p>
-        Suivez-nous sur :{" "}
-        <a href="https://twitter.com/Finna" target="_blank" rel="noreferrer">
-          Twitter
-        </a>
-        ,{" "}
-        <a href="https://instagram.com/Finna" target="_blank" rel="noreferrer">
-          Instagram
-        </a>
-        .
-      </p>
-    </footer>
+        <div className="footer-container">© 2025 Finna. Tous droits réservés.</div>
+      </footer>
   );
 };
 
