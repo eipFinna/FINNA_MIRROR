@@ -5,16 +5,22 @@ const pool = require('../config/dbConfig');
  * @param {string} keywords — chaîne brute extraite de l'utilisateur
  * @param {number} limit    — nombre max d'articles retournés
  */
+const MIN_SCORE = parseFloat(process.env.MIN_SCORE || '0.15');
+
 async function queryWithTerms(terms, limit) {
   const q = terms.join(' ');
   const sql = `
     SELECT title, article, date, url,
-           ts_rank(
-             tsv,
-             websearch_to_tsquery('french', $1)
-           ) AS score
+      ts_rank(
+        setweight(to_tsvector('french', coalesce(title, '')), 'A')
+        || setweight(tsv, 'B'),
+        websearch_to_tsquery('french', $1)
+      ) AS score
     FROM article_tab
-    WHERE tsv @@ websearch_to_tsquery('french', $1)
+    WHERE
+      (to_tsvector('french', coalesce(title, '')) @@ websearch_to_tsquery('french', $1))
+      OR
+      (tsv @@ websearch_to_tsquery('french', $1))
     ORDER BY score DESC
     LIMIT $2;
   `;

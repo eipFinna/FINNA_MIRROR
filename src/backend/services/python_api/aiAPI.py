@@ -7,6 +7,10 @@ import time
 from flask import Flask, request, jsonify
 import re
 from collections import Counter
+import spacy
+
+# --- Chargement du modèle NLP français ---
+nlp = spacy.load("fr_core_news_lg")  # require: python3 -m spacy download fr_core_news_lg
 
 # ONNX Runtime + optimal quantization
 import onnxruntime as ort
@@ -27,6 +31,7 @@ tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 sess_options = ort.SessionOptions()
 sess_options.intra_op_num_threads = os.cpu_count()
 sess_options.inter_op_num_threads = os.cpu_count()
+sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
 
 # Choisir CUDA si dispo, fallback CPU
 providers = (
@@ -41,7 +46,13 @@ model = ORTModelForSeq2SeqLM.from_pretrained(
     session_options=sess_options,
     providers=providers
 )
-logging.info("✅ Loaded ONNX Runtime quantized model from %s", ONNX_QUANT_DIR)
+logging.info("\033[92m Loaded ONNX Runtime quantized model from %s\033[0m", ONNX_QUANT_DIR)
+
+# --- Test de génération pour éviter le "cold start" ---
+_ = model.generate(
+    **tokenizer("Bonjour", return_tensors="pt", padding=True),
+    num_beams=1, max_new_tokens=1
+)
 
 # --- Stopwords français (liste réduite) ---
 STOPWORDS = {
@@ -51,16 +62,35 @@ STOPWORDS = {
     "ou", "où", "sa", "son", "ses", "mes", "tes", "nos", "votres",
     "leur", "leurs", "du", "au", "«", "»"
 }
-
-
 def extract_keywords(text: str, top_n: int = 5) -> list[str]:
-    words = re.findall(r"\w+", text.lower(), flags=re.UNICODE)
-    filtered = [
-        w for w in words
-        if len(w) > 3 and not w.isdigit() and w not in STOPWORDS
-    ]
-    counts = Counter(filtered)
-    return [w for w, _ in counts.most_common(top_n)]
+    doc = nlp(text)
+
+    # 1. On extrait d'abord les PERSON (multi-mots conservés)
+    persons = [ent.text for ent in doc.ents if ent.label_ == "PER"]
+
+    # 2. On génère des lemmas pour les autres termes
+    words = [tok.lemma_.lower() for tok in doc
+             if not tok.is_stop
+             and tok.pos_ in {"NOUN","PROPN","VERB"}
+             and len(tok.lemma_) > 3]
+    counts = Counter(words)
+
+    # 3. On assemble en donnant la priorité aux personnes
+    keywords = []
+    used_lemmas = set()
+    # Ajoute les personnes et marque leurs tokens pour éviter les doublons
+    for name in persons:
+        name_lemmas = {tok.lemma_.lower() for tok in nlp(name)}
+        if not any(l in used_lemmas for l in name_lemmas):
+            keywords.append(name)
+            used_lemmas.update(name_lemmas)
+    # Ajoute les autres mots-clés sans doublon de lemme
+    for w, _ in counts.most_common(top_n):
+        if w not in used_lemmas and w not in (kw.lower() for kw in keywords):
+            keywords.append(w)
+            used_lemmas.add(w)
+    # 4. On tronque à top_n  
+    return keywords[:top_n]
 
 
 def summarize_chunk(
@@ -101,6 +131,7 @@ def keywords_route():
 
 @app.route("/summarize", methods=["POST"])
 def summarize_route():
+    t0 = time.time()
     data = request.get_json(force=True)
     text = data.get("text", "")
     if not text or not isinstance(text, str):
@@ -112,25 +143,31 @@ def summarize_route():
         chunks = [text]
     else:
         chunks = [text[i:i+max_chars] for i in range(0, len(text), max_chars)]
+    app.logger.info(f"[SUM] {len(chunks)} chunks en {time.time()-t0:.2f}s")
 
     # 2) Mini-résumés
+    t1 = time.time()
     partials = []
     for idx, chunk in enumerate(chunks):
         try:
             partials.append(summarize_chunk(chunk))
         except Exception as e:
             app.logger.error(f"Erreur sur chunk #{idx}: {e}", exc_info=True)
+    app.logger.info(f"[SUM] 1st generate: {len(partials)} partials en {time.time()-t1:.2f}s")
 
     if not partials:
         return jsonify({"error": "Impossible de résumer les chunks"}), 500
 
     # 3) Résumé agrégé (on fait un seul appel de résumé final)
+    t2 = time.time()
     aggregate = " ".join(partials)
     try:
         final_summary = summarize_chunk(aggregate)
     except Exception as e:
         app.logger.error(f"Erreur résumé final: {e}", exc_info=True)
         return jsonify({"error": "Erreur lors du résumé final"}), 500
+    app.logger.info(f"[SUM] 2nd generate: 1 final en {time.time()-t2:.2f}s")
+    app.logger.info(f"[SUM] Total duration: {time.time()-t0:.2f}s")
 
     return jsonify({"summary": final_summary})
 
