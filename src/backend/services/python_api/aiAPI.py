@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-# src/backend/services/aiServer/aiAPI.py
+# Lancement: python3 aiAPI.py
 
 import os
 import logging
 import time
 from flask import Flask, request, jsonify
-import re
 from collections import Counter
 import spacy
+import sys
+from pathlib import Path
 
 # --- Chargement du modèle NLP français ---
 nlp = spacy.load("fr_core_news_lg")  # require: python3 -m spacy download fr_core_news_lg
@@ -23,6 +24,18 @@ logging.basicConfig(level=logging.INFO)
 # --- Configurations ---
 MODEL_NAME     = "plguillou/t5-base-fr-sum-cnndm"
 ONNX_QUANT_DIR = "./onnx-t5-base-fr-quant"  # chemin vers votre modèle ONNX quantifié
+
+# Vérification de la présence des fichiers ONNX quantifiés
+onnx_dir = Path(ONNX_QUANT_DIR)
+onnx_files = list(onnx_dir.glob("*.onnx"))
+if not onnx_files:
+    sys.stderr.write(
+        f"\n\033[91m[ERREUR] Aucun fichier ONNX trouvé dans {ONNX_QUANT_DIR} !\033[0m\n"
+        "Veuillez d'abord exporter le modèle avec :\n"
+        "    python3 export_onnx.py\n"
+        "(depuis le dossier src/backend/services/python_api)\n\n"
+    )
+    sys.exit(1)
 
 # --- Tokenizer ---
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)

@@ -1,7 +1,21 @@
+# Dépendences pour python
+# Avant de lancer l'installation, n'oubliez de faire un: pip install --upgrade pip
+# Utiliser pip install -r requirements.txt pour installer les dépendances
+# ==========================================================
+# RAPPEL : Après installation, exécutez bien la commande :
+#     python3 -m spacy download fr_core_news_lg
+# ==========================================================
+# ==========================================================
+# APRÈS avoir installé les dépendances, lancez l’export du modèle ONNX avec la commande :
+#     python3 export_onnx.py
+# (depuis le dossier src/backend/services/python_api)
+# ==========================================================
 flask
 transformers
 torch
 onnx
 optimum
+optimum[onnxruntime]
 onnxruntime
 protobuf
+spacy

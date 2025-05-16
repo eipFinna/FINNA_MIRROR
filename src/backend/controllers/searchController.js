@@ -27,7 +27,7 @@ async function searchAndSummarize(query, maxArticles = parseInt(process.env.MAX_
     const endDbQuery = dbQuery.startTimer();
     const articles = await findArticlesByKeywords(keywords, maxArticles);
     console.log('Articles trouvés :', articles.length);
-    console.log('Détails des articles :', articles);
+    // console.log('Détails des articles :', articles); # Commenté pour éviter trop de logs
     endDbQuery();
 
     // 3. Si aucun article pertinent
