@@ -8,3 +8,14 @@ body {
 .App {
   text-align: center;
 }
+
+:root {
+  --primary-blue: #1a73e8;
+  --light-blue: #e8f0fe;
+  --dark-blue: #0f4bac;
+  --white: #ffffff;
+  --light-gray: #f1f3f4;
+  --text-dark: #202124;
+  --text-light: #5f6368;
+  --border-color: #dadce0;
+}
