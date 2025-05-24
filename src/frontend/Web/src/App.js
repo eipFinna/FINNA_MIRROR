@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Features from "./components/Features";
 import DownloadSection from "./components/DownloadSection";
@@ -10,22 +10,12 @@ import Documentation from "./components/Documentation";
 import "./App.css";
 import LoginRegister from "./pages/LoginRegister";
 
-function GoToLogin() {
-  const navigate = useNavigate();
-  return (
-    <button onClick={() => navigate("/login")}>
-      Go to Login Page
-    </button>
-  );
-}
-
 function Home() {
   return (
     <div className="App">
       <Header />
       <Features />
       <Documentation />
-      <GoToLogin />
       <DownloadSection />
       <UserFeedback />
       <Footer />

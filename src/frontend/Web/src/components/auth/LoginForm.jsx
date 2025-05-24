@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import './AuthForms.css';
+import { useNavigate } from 'react-router-dom';
 
 function LoginForm() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -47,6 +49,8 @@ function LoginForm() {
     if (validate()) {
       // TODO - Handle form submission
       console.log('Login form submitted:', formData);
+      // go to the /finna page
+      navigate('/finna');
     }
   };
   
