@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './AuthForms.css';
+import { registerUser } from '../../services/userApi';
 
 function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -63,6 +64,18 @@ function RegisterForm() {
     
     if (validate()) {
       // TODO - Handle form submission
+      registerUser(formData.email, formData.password)
+        .then(response => {
+          console.log('User registered successfully:', response);
+        })
+        .catch(error => {
+          console.error('Error registering user:', error);
+          if (error.response && error.response.status === 409) {
+            setErrors({ email: 'Email already exists' });
+          } else {
+            setErrors({ general: 'An error occurred while registering. Please try again.' });
+          }
+        });
       console.log('Register form submitted:', formData);
     }
   };
