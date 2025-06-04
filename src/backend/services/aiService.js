@@ -1,29 +1,33 @@
-const { exec } = require('child_process');
+const axios = require('axios');
+const { iaBatch } = require('../services/metricsService');
+const FLASK_URL = process.env.FLASK_URL || 'http://localhost:5000';
 
-exports.getKeywords = (inputText) => {
-    return new Promise((resolve, reject) => {
-        exec(`python3 services/aiKeyword.py "${inputText}"`, (error, stdout, stderr) => {
-            if (error) return reject(error);
-            if (stderr) return reject(stderr);
-            resolve(stdout.trim());
-        });
-    });
-};
+// Extrait les mots-clés
+async function getKeywords(text) {
+  const resp = await axios.post(`${FLASK_URL}/keywords`, { text });
+  return resp.data.keywords; 
+}
 
-// Fonction pour résumer le texte avec le script Python
-exports.summarizeWithPython = (text) => {
-    return new Promise((resolve, reject) => {
-        const command = `python3 services/aiSummarize.py "${text.replace(/"/g, '\\"')}"`; // Échapper les guillemets
-        exec(command, { maxBuffer: 1024 * 1024 }, (error, stdout, stderr) => {
-            if (error) {
-                console.error("Erreur lors de l'exécution du script Python :", error);
-                return reject(error);
-            }
-            if (stderr) {
-                console.error("Erreur STDERR depuis le script Python :", stderr);
-                return reject(stderr);
-            }
-            resolve(stdout.trim());
-        });
-    });
+// Résume un article
+async function summarizeArticle(text) {
+  const resp = await axios.post(`${FLASK_URL}/summarize`, { text });
+  return resp.data.summary;
+}
+
+async function summarizeAggregate(text) {
+  return summarizeArticle(text);
+}
+
+async function summarizeBatch(texts) {
+  const end = iaBatch.startTimer();
+  const resp = await axios.post(`${FLASK_URL}/batch_summarize`, { texts });
+  end();
+  return resp.data.summaries;
+}
+
+module.exports = {
+  getKeywords,
+  summarizeArticle,
+  summarizeAggregate,
+  summarizeBatch,
 };

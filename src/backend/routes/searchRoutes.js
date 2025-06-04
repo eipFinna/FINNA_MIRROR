@@ -1,7 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const searchController = require('../controllers/searchController');
+// Récupère directement le handler de recherche
+const { getSummarizedArticles } = require('../controllers/searchController');
 
-router.get('/', searchController.getSummarizedArticles);
+// Route GET /search pour la recherche via query string
+router.get('/', getSummarizedArticles);
+// Route POST /search pour la recherche via body
+router.post('/', getSummarizedArticles);
 
 module.exports = router;

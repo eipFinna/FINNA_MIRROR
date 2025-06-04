@@ -1,5 +1,6 @@
 build
 .venv
 .env
+.vscode
 scrapping/__pycache__
 scrapping/.pytest_cache
