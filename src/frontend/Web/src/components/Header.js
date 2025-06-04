@@ -1,7 +1,10 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "./Header.css";
 
 const Header = () => {
+  const navigate = useNavigate();
+
   return (
     <header className="header">
       <div className="header-content">
@@ -13,6 +16,12 @@ const Header = () => {
         <a href="#download" className="cta-button">
           Télécharger Finna
         </a>
+        <button
+          className="login-button"
+          onClick={() => navigate("/login")}
+        >
+          Se connecter
+        </button>
       </div>
     </header>
   );
