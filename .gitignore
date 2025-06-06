@@ -3,3 +3,4 @@ build
 .env
 scrapping/__pycache__
 scrapping/.pytest_cache
+package-lock.json

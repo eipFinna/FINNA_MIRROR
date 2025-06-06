@@ -1,19 +1,21 @@
 const dbService = require("../services/dbService");
+const bcrypt = require("bcryptjs");
 
 exports.registerUser = async (req, res) => {
     try {
         const { email, password } = req.body;
         console.log("registerUser called with email:", email);
 
+
         if (!email || !password) {
             return res.status(400).send("Email and password are required.");
         }
 
-        // Enregistrer l'utilisateur dans la base de données
-        const newUser = await dbService.registerUserInDB(email, password);
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newUser = await dbService.registerUserInDB(email, hashedPassword);
         console.log("User registered successfully:", newUser);
 
-        // Retourner la réponse au client
         res.status(201).json({
             message: "User registered successfully",
             user: {
