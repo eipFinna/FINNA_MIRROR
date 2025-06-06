@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './AuthForms.css';
 import { useNavigate } from 'react-router-dom';
+import { loginUser } from '../../services/userApi';
 
 function LoginForm() {
   const navigate = useNavigate();
@@ -47,10 +48,18 @@ function LoginForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validate()) {
-      // TODO - Handle form submission
-      console.log('Login form submitted:', formData);
-      // go to the /finna page
-      navigate('/finna');
+      loginUser(formData.email, formData.password)
+      .then(response => {
+        console.log('Login successful:', response);
+        navigate('/finna');
+      }).catch(error => {
+        console.error('Login failed:', error);
+        if (error && error.status === 401) {
+          setErrors({ response: 'Invalid email or password' });
+        } else {
+          setErrors({ response: 'An error occurred. Please try again.' });
+        }
+      });
     }
   };
   
@@ -104,7 +113,9 @@ function LoginForm() {
       <button type="submit" className="auth-button">
         Sign In
       </button>
-      
+      <div style={{ textAlign: 'center'}}>
+        {errors.response && <p className="error-message" style={{ fontSize: '18px'}}>{errors.response}</p>}
+      </div>
       <div className="auth-divider">
         <span>or continue with</span>
       </div>

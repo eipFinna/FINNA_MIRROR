@@ -25,3 +25,17 @@ exports.registerUserInDB = async (email, password) => {
     }
     return result.rows[0];
 }
+
+exports.getUserByEmail = async (email) => {
+    const query = `
+        SELECT "id", "email", "password"
+        FROM "users"
+        WHERE "email" = $1
+    `;
+    const values = [email];
+    const result = await db.query(query, values);
+    if (result.rows.length === 0) {
+        return null;
+    }
+    return result.rows[0];
+}

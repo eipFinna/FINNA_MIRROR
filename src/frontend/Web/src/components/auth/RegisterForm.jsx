@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './AuthForms.css';
 import { registerUser } from '../../services/userApi';
 
 function RegisterForm() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -63,7 +65,6 @@ function RegisterForm() {
     e.preventDefault();
     
     if (validate()) {
-      // TODO - Handle form submission
       registerUser(formData.email, formData.password)
         .then(response => {
           console.log('User registered successfully:', response);
@@ -76,7 +77,7 @@ function RegisterForm() {
             setErrors({ general: 'An error occurred while registering. Please try again.' });
           }
         });
-      console.log('Register form submitted:', formData);
+      navigate('/finna');
     }
   };
   
