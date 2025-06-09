@@ -18,7 +18,7 @@ exports.registerUserInDB = async (email, password) => {
         RETURNING "id", "email"
     `;
     const values = [email, password];
-    console.log("registerUserInDB called with values:", values);
+    console.log("registerUserInDB called with email:", email);
     const result = await db.query(query, values);
     if (result.rows.length === 0) {
         throw new Error('User registration failed');
