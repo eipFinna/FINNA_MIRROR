@@ -6,6 +6,7 @@ const searchRoutes = require('./routes/searchRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
 const registerRoutes = require ('./routes/registerRoutes');
 const loginRoutes = require('./routes/loginRoutes');
+const metricsRoutes = require('./routes/metricsRoutes');
 
 const app = express();
 require('dotenv').config();
@@ -17,6 +18,10 @@ app.use('/search', searchRoutes); // A remplacer par "/api/search" pour les rout
 app.use('/feedback', feedbackRoutes);
 app.use('/register', registerRoutes);
 app.use('/login', loginRoutes);
+app.use('/metrics', metricsRoutes);
+app.get('/', (req, res) => {
+    res.send('Welcome to the backend API');
+});
 
 app.listen(appConfig.port, () => {
     console.log(`Server running on port ${appConfig.port}`);
