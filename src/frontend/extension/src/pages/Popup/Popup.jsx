@@ -1,39 +1,60 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './Popup.css';
 import { useState } from 'react';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import { Button, Link } from '@mui/material';
+import EastIcon from '@mui/icons-material/East';
 import loadingGif from './loading.gif';
 import { format } from 'date-fns';
 
+function StyledButton({ width, children, ...props }) {
+  return (
+    <Button
+      size="large"
+      variant="contained"
+      
+      sx={{
+        width: width,
+        display: 'inline-flex', // Ensure correct display
+        backgroundColor: '#0057D9',
+        color: '#ffff',
+        fontSize: '14px',
+        '&:hover': {
+          backgroundColor: '#0046b3',
+        },
+      }}
+      {...props}
+    >
+      {children}
+    </Button>
+  );
+}
+
 const Popup = () => {
-  const [text, setText] = useState('');
+  const [text, setText] = useState('test');
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [tmpText, setTmpText] = useState('');
   const [link, setLink] = useState('');
   const [date, setDate] = useState('');
-  useState(() => {
-    //put the tmpText in a variable
-    chrome.storage.local.get("tmpText", function (result) {
-      setTmpText(result.tmpText);
-    });
-    chrome.storage.local.get("selectedText", function (result) {
-      if (result.selectedText !== tmpText) {
-        console.log(tmpText)
-        console.log('Value currently is ' + result.selectedText);
-        setInputText(result.selectedText);
-        // set the result.selectedText in the local storage tmpText
-        chrome.storage.local.set({ "tmpText": result.selectedText }, function () {
-          console.log('Value is set to ' + result.selectedText);
-        });
+  const [articleLength, setArticleLength] = useState(0);
+
+  useEffect(() => {
+    chrome.storage.local.get(['tmpText', 'selectedText'], (result) => {
+      const { tmpText, selectedText } = result;
+      if (selectedText && selectedText !== tmpText) {
+        setInputText(selectedText);
+        chrome.storage.local.set({ tmpText: selectedText });
+      } else if (selectedText) {
+        setInputText(selectedText);
       } else {
         setInputText('');
       }
     });
   }, []);
+
 
   async function analyseText() {
     setIsLoading(true);
@@ -43,14 +64,15 @@ const Popup = () => {
     console.log(json.summary);
     setText(json.summary);
     setLink(json.articles[0].url);
-    setDate(format(json.articles[0].date, 'dd/MM/yyyy'));
+    setDate(format(json.articles[0].date, 'dd/MM/yyyy'))
+    setArticleLength(json.articles.length);
     setIsLoading(false);
   }
 
   return (
     <Box className="App">
       <Box className="App-header">
-        <Typography variant="h4">Finna</Typography>
+        <Typography variant="h5">Finna</Typography>
       </Box>
       <Box display="flex" flexDirection="column">
         <Box
@@ -60,18 +82,20 @@ const Popup = () => {
           alignItems="center"
           justifyContent="center"
           gap="16px"
+          width="100%"
         >
           <TextField
             id="outlined-multiline-flexible"
             label="Text à analyser"
             multiline
-            maxRows={4}
+            maxRows={3}
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
+            sx={{ width: '90%', backgroundColor: 'white' }}
           />
-          <Button size="large" variant="contained" onClick={analyseText}>
-            Analyser le texte
-          </Button>
+          <StyledButton width="90%" onClick={analyseText}>
+            Vérifier
+          </StyledButton>
         </Box>
         <Box
           display="flex"
@@ -81,7 +105,34 @@ const Popup = () => {
           gap={2}
         >
           {isLoading && <img src={loadingGif} width="64px" alt="loading" />}
-          <DisplayText text={text} />
+          {text &&
+          <Box
+            display={'flex'}
+            flexDirection={'column'}
+            bgcolor={'#ffff'}
+            borderRadius={2}
+            alignItems={'left'}
+            textAlign={'left'}
+            padding={2}
+            gap={2}
+            width="90%"
+            alignContent={'left'}
+            sx={{
+              outline: '2px solid #E2E8F0',
+              outlineOffset: '-2px',
+            }}
+          >
+            <Box>
+              <Typography variant='h6'>Résumé</Typography>
+              <DisplayText text={text} />
+              <DisplayText text={`${articleLength} sources trouvées`} />
+            </Box>
+              <Box display="flex" justifyContent="center">
+                <StyledButton width="50%" endIcon={<EastIcon />} onClick={analyseText}>
+                  Voir les sources
+                </StyledButton>
+              </Box>
+          </Box>}
           <Box display="flex" flexDirection="row" gap={2}>
             {link !== '' && (
               <Link variant="caption" target="_blank" href={link}>
@@ -98,7 +149,7 @@ const Popup = () => {
 
 function DisplayText({ text }) {
   return (
-    <Typography paddingX="16px" variant="body2">
+    <Typography variant="body2">
       {text}
     </Typography>
   );
