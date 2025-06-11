@@ -4,8 +4,10 @@ import { useState } from 'react';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import { Button, Link } from '@mui/material';
+import { Button, Link, Drawer, Card, CardContent, CardActions, Divider } from '@mui/material';
 import EastIcon from '@mui/icons-material/East';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import CloseIcon from '@mui/icons-material/Close';
 import loadingGif from './loading.gif';
 import { format } from 'date-fns';
 
@@ -14,10 +16,9 @@ function StyledButton({ width, children, ...props }) {
     <Button
       size="large"
       variant="contained"
-      
       sx={{
         width: width,
-        display: 'inline-flex', // Ensure correct display
+        display: 'inline-flex',
         backgroundColor: '#0057D9',
         color: '#ffff',
         fontSize: '14px',
@@ -33,41 +34,107 @@ function StyledButton({ width, children, ...props }) {
 }
 
 const Popup = () => {
-  const [text, setText] = useState('test');
+  const [text, setText] = useState('');
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [tmpText, setTmpText] = useState('');
   const [link, setLink] = useState('');
   const [date, setDate] = useState('');
   const [articleLength, setArticleLength] = useState(0);
+  const [articles, setArticles] = useState([]);
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
 
-  useEffect(() => {
-    chrome.storage.local.get(['tmpText', 'selectedText'], (result) => {
-      const { tmpText, selectedText } = result;
-      if (selectedText && selectedText !== tmpText) {
-        setInputText(selectedText);
-        chrome.storage.local.set({ tmpText: selectedText });
-      } else if (selectedText) {
-        setInputText(selectedText);
-      } else {
-        setInputText('');
+  // Load all saved data when the extension opens
+useEffect(() => {
+  chrome.storage.local.get(
+    ['savedText', 'savedInputText', 'savedLink', 'savedDate', 
+     'savedArticleLength', 'savedArticles', 'tmpText', 'selectedText'], 
+    (result) => {
+      // If tmpText exists, use it as the input text
+      // if (result.tmpText) {
+      //   setInputText(result.tmpText);
+      // } 
+      // Otherwise, if selectedText exists, use it
+      if (result.selectedText) {
+        setInputText(result.selectedText);
+        // Save it as tmpText so we know it's been seen
+        chrome.storage.local.set({ tmpText: result.selectedText });
       }
+      // Otherwise, restore from saved input text if it exists
+      else if (result.savedInputText) {
+        setInputText(result.savedInputText);
+      }
+      
+      // Then restore previous search results if they exist
+      if (result.savedText) {
+        setText(result.savedText);
+        setLink(result.savedLink || '');
+        setDate(result.savedDate || '');
+        setArticleLength(result.savedArticleLength || 0);
+        setArticles(result.savedArticles || []);
+      }
+    }
+  );
+}, []);
+
+
+  const saveResults = (data) => {
+    chrome.storage.local.set({
+      savedText: data.summary,
+      savedInputText: inputText,
+      savedLink: data.articles[0].url,
+      savedDate: format(new Date(data.articles[0].date), 'dd/MM/yyyy'),
+      savedArticleLength: data.articles.length,
+      savedArticles: data.articles
     });
-  }, []);
+  };
 
-
-  async function analyseText() {
-    setIsLoading(true);
+async function analyseText() {
+  setIsLoading(true);
+  try {
     const response = await fetch(`http://localhost:3001/search?q=${inputText}`);
     const json = await response.json();
     console.log(json);
-    console.log(json.summary);
+    
+    if (!json || !json.summary || !json.articles || json.articles.length === 0) {
+      setText('Aucun résultat trouvé.');
+      setArticles([]);
+      setLink('');
+      setDate('');
+      setArticleLength(0);
+      return;
+    }
     setText(json.summary);
+    setArticles(json.articles);
     setLink(json.articles[0].url);
-    setDate(format(json.articles[0].date, 'dd/MM/yyyy'))
+    setDate(format(new Date(json.articles[0].date), 'dd/MM/yyyy'));
     setArticleLength(json.articles.length);
+    
+    saveResults(json);
+    
+    chrome.storage.local.remove(['tmpText', 'selectedText']);
+  } catch (error) {
+    console.error('Error fetching results:', error);
+  } finally {
     setIsLoading(false);
   }
+}
+
+  const togglePanel = () => {
+    setIsPanelOpen(!isPanelOpen);
+  };
+
+  const clearResults = () => {
+    setText('');
+    setArticles([]);
+    setLink('');
+    setDate('');
+    setArticleLength(0);
+    
+    chrome.storage.local.remove([
+      'savedText', 'savedInputText', 'savedLink', 
+      'savedDate', 'savedArticleLength', 'savedArticles'
+    ]);
+  };
 
   return (
     <Box className="App">
@@ -93,9 +160,11 @@ const Popup = () => {
             onChange={(e) => setInputText(e.target.value)}
             sx={{ width: '90%', backgroundColor: 'white' }}
           />
-          <StyledButton width="90%" onClick={analyseText}>
-            Vérifier
-          </StyledButton>
+          <Box display="flex" width="90%" gap={2}>
+            <StyledButton width="100%" onClick={analyseText}>
+              Vérifier
+            </StyledButton>
+          </Box>
         </Box>
         <Box
           display="flex"
@@ -127,22 +196,77 @@ const Popup = () => {
               <DisplayText text={text} />
               <DisplayText text={`${articleLength} sources trouvées`} />
             </Box>
-              <Box display="flex" justifyContent="center">
-                <StyledButton width="50%" endIcon={<EastIcon />} onClick={analyseText}>
-                  Voir les sources
-                </StyledButton>
-              </Box>
+            <Box display="flex" justifyContent="center">
+              <StyledButton width="50%" endIcon={<EastIcon />} onClick={togglePanel}>
+                Voir les sources
+              </StyledButton>
+            </Box>
           </Box>}
-          <Box display="flex" flexDirection="row" gap={2}>
-            {link !== '' && (
-              <Link variant="caption" target="_blank" href={link}>
-                voir plus
-              </Link>
-            )}
-            {date !== '' && <Typography variant="caption">{date}</Typography>}
-          </Box>
         </Box>
       </Box>
+
+      <Drawer
+        anchor="right"
+        open={isPanelOpen}
+        onClose={togglePanel}
+        PaperProps={{
+          sx: {
+            width: '350px',
+            padding: '16px',
+            backgroundColor: '#f8f9fa',
+          }
+        }}
+      >
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <Typography variant="h6">Sources ({articleLength})</Typography>
+          <Button 
+            onClick={togglePanel}
+            sx={{ minWidth: 'auto', p: '4px' }}
+          >
+            <CloseIcon />
+          </Button>
+        </Box>
+        <Divider sx={{ mb: 2 }} />
+        
+        <Box sx={{ overflowY: 'auto', height: 'calc(100% - 60px)' }}>
+          {articles.map((article, index) => (
+            <Card 
+              key={index} 
+              sx={{ 
+                mb: 2,
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                border: '1px solid #E2E8F0'
+              }}
+            >
+              <CardContent sx={{ pb: 1 }}>
+                <Typography variant="h6" fontSize="16px" fontWeight="bold" mb={1}>
+                  {article.title}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" mb={0.5}>
+                  Source: {article.provider}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Date: {format(new Date(article.date), 'dd/MM/yyyy')}
+                </Typography>
+              </CardContent>
+              <CardActions>
+                <Button 
+                  size="small" 
+                  href={article.url} 
+                  target="_blank"
+                  endIcon={<OpenInNewIcon />}
+                  sx={{ 
+                    color: '#0057D9',
+                    '&:hover': { backgroundColor: 'rgba(0, 87, 217, 0.05)' }
+                  }}
+                >
+                  Voir l'article
+                </Button>
+              </CardActions>
+            </Card>
+          ))}
+        </Box>
+      </Drawer>
     </Box>
   );
 };
