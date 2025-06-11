@@ -10,8 +10,7 @@ function LoginRegister() {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
-          <h1>{isLoginView ? 'Welcome Back' : 'Create an Account'}</h1>
-
+          <h1>{isLoginView ? 'Bienvenue' : 'Créer un compte'}</h1>
         </div>
         
         <div className="auth-tabs">
@@ -19,13 +18,13 @@ function LoginRegister() {
             className={`auth-tab ${isLoginView ? 'active' : ''}`}
             onClick={() => setIsLoginView(true)}
           >
-            Login
+            Se connecter
           </button>
           <button 
             className={`auth-tab ${!isLoginView ? 'active' : ''}`}
             onClick={() => setIsLoginView(false)}
           >
-            Register
+            S'enregistrer
           </button>
         </div>
         
@@ -36,13 +35,13 @@ function LoginRegister() {
         <div className="auth-footer">
           <p>
             {isLoginView 
-              ? "Don't have an account?" 
-              : "Already have an account?"}
+              ? "Vous n'avez pas de compte ?" 
+              : "Vous avez déjà un compte ?"}
             <button 
               className="auth-text-button"
               onClick={() => setIsLoginView(!isLoginView)}
             >
-              {isLoginView ? 'Sign up' : 'Sign in'}
+              {isLoginView ? "S'enregistrer" : "Se connecter"}
             </button>
           </p>
         </div>

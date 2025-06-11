@@ -2,6 +2,7 @@
   "name": "finna",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:3001",
   "dependencies": {
     "@testing-library/user-event": "^13.5.0",
     "react": "^18.3.1",

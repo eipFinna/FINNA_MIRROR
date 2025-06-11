@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './AuthForms.css';
+import { registerUser } from '../../services/userApi';
 
 function RegisterForm() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -31,27 +34,27 @@ function RegisterForm() {
     const newErrors = {};
     
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = 'Le nom est requis';
     }
     
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = 'L\'email est requis';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
+      newErrors.email = 'L\'email est invalide';
     }
     
     if (!formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = 'Le mot de passe est requis';
     } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
+      newErrors.password = 'Le mot de passe doit contenir au moins 8 caractères';
     }
     
     if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+      newErrors.confirmPassword = 'Les mots de passe ne correspondent pas';
     }
     
     if (!formData.agreeTerms) {
-      newErrors.agreeTerms = 'You must agree to the terms and conditions';
+      newErrors.agreeTerms = 'Vous devez accepter les conditions générales';
     }
     
     setErrors(newErrors);
@@ -62,21 +65,32 @@ function RegisterForm() {
     e.preventDefault();
     
     if (validate()) {
-      // TODO - Handle form submission
-      console.log('Register form submitted:', formData);
+      registerUser(formData.email, formData.password)
+        .then(response => {
+          console.log('Utilisateur enregistré avec succès :', response);
+        })
+        .catch(error => {
+          console.error('Erreur lors de l\'enregistrement :', error);
+          if (error.response && error.response.status === 409) {
+            setErrors({ email: 'Cet email existe déjà' });
+          } else {
+            setErrors({ general: 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.' });
+          }
+        });
+      navigate('/finna');
     }
   };
   
   return (
     <form className="auth-form" onSubmit={handleSubmit}>
       <div className="form-group">
-        <label htmlFor="name">Full Name</label>
+        <label htmlFor="name">Nom</label>
         <input
           type="text"
           id="name"
           name="name"
           className={`form-input ${errors.name ? 'input-error' : ''}`}
-          placeholder="John Doe"
+          placeholder="Jean Dupont"
           value={formData.name}
           onChange={handleChange}
         />
@@ -90,7 +104,7 @@ function RegisterForm() {
           id="email"
           name="email"
           className={`form-input ${errors.email ? 'input-error' : ''}`}
-          placeholder="your@email.com"
+          placeholder="votre@email.com"
           value={formData.email}
           onChange={handleChange}
         />
@@ -98,7 +112,7 @@ function RegisterForm() {
       </div>
       
       <div className="form-group">
-        <label htmlFor="password">Password</label>
+        <label htmlFor="password">Mot de passe</label>
         <input
           type="password"
           id="password"
@@ -112,7 +126,7 @@ function RegisterForm() {
       </div>
       
       <div className="form-group">
-        <label htmlFor="confirmPassword">Confirm Password</label>
+        <label htmlFor="confirmPassword">Confirmez le mot de passe</label>
         <input
           type="password"
           id="confirmPassword"
@@ -135,17 +149,17 @@ function RegisterForm() {
           className={errors.agreeTerms ? 'checkbox-error' : ''}
         />
         <label htmlFor="agreeTerms">
-          I agree to the <a href="/terms" className="terms-link">Terms and Conditions</a>
+          J'accepte les <a href="/terms" className="terms-link">Conditions Générales</a>
         </label>
         {errors.agreeTerms && <p className="error-message">{errors.agreeTerms}</p>}
       </div>
       
       <button type="submit" className="auth-button">
-        Create Account
+        Créer un compte
       </button>
       
       <div className="auth-divider">
-        <span>or register with</span>
+        <span>ou inscrivez-vous avec</span>
       </div>
       
       <div className="social-buttons">

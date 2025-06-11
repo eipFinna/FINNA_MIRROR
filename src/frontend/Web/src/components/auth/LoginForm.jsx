@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './AuthForms.css';
 import { useNavigate } from 'react-router-dom';
+import { loginUser } from '../../services/userApi';
 
 function LoginForm() {
   const navigate = useNavigate();
@@ -31,13 +32,13 @@ function LoginForm() {
     const newErrors = {};
     
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = 'L\'email est requis';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
+      newErrors.email = 'L\'email est invalide';
     }
     
     if (!formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = 'Le mot de passe est requis';
     }
     
     setErrors(newErrors);
@@ -47,10 +48,18 @@ function LoginForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validate()) {
-      // TODO - Handle form submission
-      console.log('Login form submitted:', formData);
-      // go to the /finna page
-      navigate('/finna');
+      loginUser(formData.email, formData.password)
+      .then(response => {
+        console.log('Connexion réussie :', response);
+        navigate('/finna');
+      }).catch(error => {
+        console.error('Échec de la connexion :', error);
+        if (error && error.status === 401) {
+          setErrors({ response: 'Email ou mot de passe invalide' });
+        } else {
+          setErrors({ response: 'Une erreur est survenue. Veuillez réessayer.' });
+        }
+      });
     }
   };
   
@@ -63,7 +72,7 @@ function LoginForm() {
           id="email"
           name="email"
           className={`form-input ${errors.email ? 'input-error' : ''}`}
-          placeholder="your@email.com"
+          placeholder="votre@email.com"
           value={formData.email}
           onChange={handleChange}
         />
@@ -71,7 +80,7 @@ function LoginForm() {
       </div>
       
       <div className="form-group">
-        <label htmlFor="password">Password</label>
+        <label htmlFor="password">Mot de passe</label>
         <input
           type="password"
           id="password"
@@ -93,20 +102,22 @@ function LoginForm() {
             checked={formData.rememberMe}
             onChange={handleChange}
           />
-          <label htmlFor="rememberMe">Remember me</label>
+          <label htmlFor="rememberMe">Se souvenir de moi</label>
         </div>
         
         <a href="/forgot-password" className="forgot-password">
-          Forgot password?
+          Mot de passe oublié ?
         </a>
       </div>
       
       <button type="submit" className="auth-button">
-        Sign In
+        Se connecter
       </button>
-      
+      <div style={{ textAlign: 'center'}}>
+        {errors.response && <p className="error-message" style={{ fontSize: '18px'}}>{errors.response}</p>}
+      </div>
       <div className="auth-divider">
-        <span>or continue with</span>
+        <span>ou continuez avec</span>
       </div>
       
       <div className="social-buttons">
