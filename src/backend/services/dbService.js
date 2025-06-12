@@ -80,4 +80,4 @@ async function findArticlesByKeywords(keywordsArr, limit = 5) {
   return results;
 }
 
-module.exports = { findArticlesByKeywords };
+exports.findArticlesByKeywords = findArticlesByKeywords;
