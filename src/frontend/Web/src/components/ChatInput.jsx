@@ -1,14 +1,24 @@
 import React, { useState } from 'react';
+import { searchArticles } from '../services/articleApi';
 
-function ChatInput({ onSendMessage }) {
+function ChatInput({ onSendMessage, setSources }) {
   const [message, setMessage] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (message.trim()) {
-      onSendMessage(message);
-      setMessage('');
-    }
+    console.log('Sending message:', message);
+    searchArticles(message)
+      .then(response => {
+        console.log('Articles found:', response);
+        if (message.trim()) {
+          setSources(response.articles);
+          onSendMessage(response.summary);
+          setMessage('');
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching articles:', error);
+      });
   };
 
   return (
@@ -16,7 +26,7 @@ function ChatInput({ onSendMessage }) {
       <input
         type="text"
         className="chat-input"
-        placeholder="Type your message here..."
+        placeholder="Votre message ici..."
         value={message}
         onChange={(e) => setMessage(e.target.value)}
       />

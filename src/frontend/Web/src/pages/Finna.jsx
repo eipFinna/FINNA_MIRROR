@@ -6,7 +6,9 @@ import './Finna.css';
 
 const FinnaPage = () => {
   const [messages, setMessages] = useState([]);
+  const [answer, setAnswer] = useState('');
   const [currentResponse, setCurrentResponse] = useState(null);
+  const [sources, setSources] = useState([]);
 
   const handleSendMessage = (text) => {
     const newMessage = {
@@ -20,10 +22,11 @@ const FinnaPage = () => {
     setTimeout(() => {
       setCurrentResponse({
         id: Date.now() + 1,
-        text: `This is a response to: "${text}"`,
+        text: text,
         timestamp: new Date().toISOString(),
       });
     }, 500);
+
   };
 
   return (
@@ -31,12 +34,12 @@ const FinnaPage = () => {
       <div className="finna-page-container">
         <aside className="history-panel">
           <h2>Chat History</h2>
-          <ChatHistory messages={messages} setCurrentResponse={setCurrentResponse} />
+          <ChatHistory messages={messages} setCurrentResponse={setCurrentResponse}/>
         </aside>
         <main className="chat-panel">
-          {currentResponse && <ChatResponse response={currentResponse} />}
+          {currentResponse && <ChatResponse response={currentResponse} answer={answer} sources={sources} />}
           <div className="input-container">
-            <ChatInput onSendMessage={handleSendMessage} />
+            <ChatInput onSendMessage={handleSendMessage} setSources={setSources} />
           </div>
         </main>
       </div>
