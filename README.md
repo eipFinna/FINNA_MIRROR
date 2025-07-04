@@ -20,7 +20,7 @@ En France, 39% des citoyens utilisent la presse numérique pour s'informer, mais
 
 - **Frontend** : React
 - **Backend** : Node.js
-- **Base de données** : MySQL / PostgreSQL
+- **Base de données** : PostgreSQL
 - **Scripts** : Python pour le scraping, Bash pour l’automatisation
 - **CI/CD** : Git
 - **IA LLM** : Modèle à définir (ex. Meta-Llama, Google Gemini)
@@ -29,7 +29,7 @@ En France, 39% des citoyens utilisent la presse numérique pour s'informer, mais
 
 ### Prérequis
 - **Node.js** : Version 16+ recommandée
-- **MySQL** : Version 8+
+- **PostgreSQL** : Version 14+
 - **Python** : Version 3.8+
 - **(Optionnel)** Docker & Docker Compose pour une installation simplifiée
 - **Git**
