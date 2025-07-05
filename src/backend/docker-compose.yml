@@ -12,6 +12,10 @@ services:
       - /app/node_modules
     depends_on:
       - flask
+    environment:
+      - MODE=${MODE:-prod}
+    command: >
+      sh -c "if [ \"$MODE\" = \"dev\" ]; then npx nodemon app.js; else npm start; fi"
 
   flask:
     build:
