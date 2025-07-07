@@ -1,0 +1,73 @@
+services:
+  backend-flask:
+    build:
+      context: ./src/backend
+      dockerfile: Dockerfile.flask
+    container_name: finna_backend_flask
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./src/backend/.env
+    networks:
+      - finna_net
+
+  backend-node:
+    build:
+      context: ./src/backend
+      dockerfile: Dockerfile.node
+    container_name: finna_backend_node
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./src/backend/.env
+    volumes:
+      - ./src/backend:/app
+      - /app/node_modules
+    depends_on:
+      - backend-flask
+    environment:
+      - MODE=${MODE:-prod}
+    command: >
+      sh -c "if [ \"$MODE\" = \"dev\" ]; then npx nodemon app.js; else npm start; fi"
+    networks:
+      - finna_net
+
+  frontend-web:
+    build:
+      context: ./src/frontend/web
+      dockerfile: Dockerfile
+    container_name: finna_frontend_web
+    volumes:
+      - ./src/frontend/web:/app
+      - /app/node_modules
+      - ./src/frontend/web/build:/app/build
+    ports:
+      - "3000:3000"
+    environment:
+      - MODE=${MODE:-prod}
+    command: >
+      sh -c "if [ \"$MODE\" = \"dev\" ]; then npm start; else sh; fi"
+    networks:
+      - finna_net
+
+  frontend-extension:
+    build:
+      context: ./src/frontend/extension
+      dockerfile: Dockerfile
+    container_name: finna_frontend_extension
+    volumes:
+      - ./src/frontend/extension:/app
+      - /app/node_modules
+      - ./src/frontend/extension/build:/app/build
+    ports:
+      - "3002:3000"
+    environment:
+      - MODE=${MODE:-prod}
+    command: >
+      sh -c "if [ \"$MODE\" = \"dev\" ]; then npm start; else sh; fi"
+    networks:
+      - finna_net
+
+networks:
+  finna_net:
+    driver: bridge
