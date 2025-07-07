@@ -32,7 +32,7 @@ if not onnx_files:
     sys.stderr.write(
         f"\n\033[91m[ERREUR] Aucun fichier ONNX trouvé dans {ONNX_QUANT_DIR} !\033[0m\n"
         "Veuillez d'abord exporter le modèle avec :\n"
-        "    python3 export_onnx.py\n"
+        "    python3 export_onnx.py --model plguillou/t5-base-fr-sum-cnndm --output onnx-t5-base-fr-quant --quantize\n"
         "(depuis le dossier src/backend/services/python_api)\n\n"
     )
     sys.exit(1)

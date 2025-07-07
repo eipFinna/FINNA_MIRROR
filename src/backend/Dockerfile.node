@@ -1,0 +1,14 @@
+FROM node:24.3.0
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+ARG MODE=prod
+
+EXPOSE 3001
+
+CMD sh -c "if [ \"$MODE\" = \"dev\" ]; then npm start; else npm run build; fi"

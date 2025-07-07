@@ -19,3 +19,6 @@ optimum[onnxruntime]
 onnxruntime
 protobuf
 spacy
+tiktoken
+blobfile
+sentencepiece
