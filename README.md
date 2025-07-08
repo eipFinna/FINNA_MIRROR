@@ -20,7 +20,7 @@ En France, 39% des citoyens utilisent la presse numérique pour s'informer, mais
 
 - **Frontend** : React
 - **Backend** : Node.js
-- **Base de données** : MySQL / PostgreSQL
+- **Base de données** : PostgreSQL
 - **Scripts** : Python pour le scraping, Bash pour l’automatisation
 - **CI/CD** : Git
 - **IA LLM** : Modèle à définir (ex. Meta-Llama, Google Gemini)
@@ -29,42 +29,122 @@ En France, 39% des citoyens utilisent la presse numérique pour s'informer, mais
 
 ### Prérequis
 - **Node.js** : Version 16+ recommandée
-- **MySQL** : Version 8+
+- **PostgreSQL** : Version 14+
 - **Python** : Version 3.8+
+- **(Optionnel)** Docker & Docker Compose pour une installation simplifiée
 - **Git**
 
 ### Instructions
 
-1. Clonez le dépôt :
+## Installation locale
+
+**Cloner le dépôt**  
    ```bash
-   git clone https://github.com/eipFinna/FINNA_MIRROR.git finna
-   cd finna
+   git clone https://github.com/eipFinna/FINNA_MIRROR.git
+   cd FINNA_MIRROR/src/backend
    ```
 
-2. Installez les dépendances pour le backend et le frontend :
+# Finna Backend (src/backend)
+
+Ce dossier contient le backend Node.js (API Express) et le service Python (Flask) pour l’IA.
+
+1. **Configurer la base de données**  
+   - Créer la base et les tables (voir `/database/dbInit.sql`).
+   - Créer un fichier `config/dbConfig.json` avec vos identifiants PostgreSQL.
+   - Exemple de fichier `dbConfig.json` vide :
+     ```json
+         {
+            "host": "",
+            "user": "",
+            "password": "",
+            "database": "",
+            "port": 5432,
+            "ssl": {
+               "rejectUnauthorized": true,
+               "ca": "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"
+            }
+         }
+     ```
+
+2. **Installer les dépendances Node.js**  
    ```bash
-   cd backend
-   npm install
-   cd ../frontend
    npm install
    ```
 
-3. Configurez la base de données :
-   - Créez une base de données MySQL et configurez le fichier `.env` dans `backend` avec vos informations d'identification.
-
-4. Lancez l’application :
+3. **Installer les dépendances Python**  
    ```bash
-   # Dans le répertoire backend
-   npm run dev
+   cd services/python_api
+   pip install -r ../../requirements.txt
+   python3 -m spacy download fr_core_news_lg
+   ```
 
-   # Dans le répertoire frontend
+4. **Exporter le modèle ONNX pour l’IA**  
+   ```bash
+   python3 export_onnx.py --model plguillou/t5-base-fr-sum-cnndm --output onnx-t5-base-fr-quant --quantize
+   ```
+
+5. **Configurer les variables d’environnement**  
+   - Créer un fichier `.env` à la racine du backend (voir `.env.example`).
+
+6. **Lancer les serveurs**  
+   - **Backend Node.js**  
+     ```bash
+     npm start
+     ```
+   - **API Python (Flask)**  
+     ```bash
+     cd services/python_api
+     python3 aiAPI.py
+     ```
+
+## Tests & Monitoring
+
+- Les métriques Prometheus sont exposées sur `/metrics`.
+- Les logs sont affichés en console.
+
+# Finna Web (src/frontend/web)
+
+Ce dossier contient le frontend React pour le site web.
+
+1. **Installer les dépendances**
+   ```bash
+   npm install
+   ```
+
+2. **Lancer l’application en développement**
+   ```bash
    npm start
    ```
+   L’application sera accessible sur [http://localhost:3000](http://localhost:3000).
 
-5. (Facultatif) Exécutez le script de scraping :
+## Scripts utiles
+
+- `npm start` : Lance l’application en mode développement.
+- `npm test` : Lance les tests unitaires avec Jest.
+- `npm run build` : Crée une version optimisée pour la production dans le dossier `build/`.
+
+# Finna Extension (src/frontend/extension)
+
+Ce dossier contient le code pour l’extension.
+
+1. **Installer les dépendances**
    ```bash
-   python scripts/scraper.py
+   npm install
    ```
+
+2. **Construire l’extension**
+   ```bash
+   npm start
+   ```
+   L’extension sera construite dans le dossier `build/`.
+
+3. **Installation de l’extension dans le navigateur**
+   - Pour Chrome, Firefox ou Edge, vous pouvez charger l’extension non empaquetée
+   # Exemple pour Chrome :
+   - Ouvrir Chrome et aller dans `chrome://extensions/`.
+   - Activer le mode développeur.
+   - Cliquer sur "Charger l’extension non empaquetée" et sélectionner le dossier `src/frontend/extension/build`.
+   - L’extension sera disponible dans la barre d’outils.
 
 ## User Story
 

@@ -1,0 +1,17 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MODE: ${MODE:-prod}
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./build:/app/build
+    ports:
+      - "3000:3000"
+    environment:
+      - MODE=${MODE:-prod}
+    command: >
+      sh -c "if [ \"$MODE\" = \"dev\" ]; then npm start; else sh; fi"

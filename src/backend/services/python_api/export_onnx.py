@@ -109,7 +109,7 @@ def export_model(
 
     _print("Sauvegarde du modèle ONNX…")
     model.save_pretrained(output_dir)
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=False)
     tokenizer.save_pretrained(output_dir)
 
     # Supprimer les fichiers quantifiés existants pour éviter SameFileError

@@ -2,3 +2,4 @@ node_modules
 dbConfig.json
 __pycache__
 *-t5-*
+package-lock.json

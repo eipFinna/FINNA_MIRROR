@@ -1,0 +1,31 @@
+services:
+  node:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - flask
+    environment:
+      - MODE=${MODE:-prod}
+    command: >
+      sh -c "if [ \"$MODE\" = \"dev\" ]; then npx nodemon app.js; else npm start; fi"
+
+  flask:
+    build:
+      context: .
+      dockerfile: Dockerfile.flask
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+
+networks:
+  default:
+    driver: bridge
