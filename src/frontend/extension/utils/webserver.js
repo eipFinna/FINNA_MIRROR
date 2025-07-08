@@ -7,8 +7,7 @@ var WebpackDevServer = require('webpack-dev-server'),
   webpack = require('webpack'),
   config = require('../webpack.config'),
   env = require('./env'),
-  path = require('path'),
-  fs = require('fs');
+  path = require('path');
 
 var options = config.chromeExtensionBoilerplate || {};
 var excludeEntriesToHotReload = options.notHotReload || [];
@@ -28,19 +27,11 @@ var compiler = webpack(config);
 
 var server = new WebpackDevServer(
   {
-    https: true, // Enable HTTPS
-    https: {
-      key: fs.readFileSync('./localhost-key.pem'),
-      cert: fs.readFileSync('./localhost-cert.pem'),
-    },
+    https: false, // Enable HTTPS
     hot: true,
     liveReload: false,
     client: {
-      webSocketURL: {
-        protocol: 'wss', // Use secure WebSocket
-        hostname: 'localhost',
-        port: env.PORT,
-      }
+      webSocketTransport: 'sockjs',
     },
     webSocketServer: 'sockjs',
     host: 'localhost',
@@ -49,7 +40,7 @@ var server = new WebpackDevServer(
       directory: path.join(__dirname, '../build'),
     },
     devMiddleware: {
-      publicPath: `https://localhost:${env.PORT}/`, // Change to HTTPS
+      publicPath: `http://localhost:${env.PORT}/`,
       writeToDisk: true,
     },
     headers: {
