@@ -73,7 +73,7 @@ async function searchAndSummarize(query, maxArticles = parseInt(process.env.MAX_
  */
 async function getSummarizedArticles(req, res, next) {
   try {
-    const query = req.query.q;
+    const query = req.query.q || req.query.query || req.body.query;
     const result = await searchAndSummarize(query);
     res.json(result);
   } catch (err) {
