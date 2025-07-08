@@ -1,0 +1,73 @@
+import React, { useState } from 'react';
+import ChatHistory from '../components/ChatHistory';
+import ChatInput from '../components/ChatInput';
+import ChatResponse from '../components/ChatResponse';
+import './Finna.css';
+import { TailChase } from 'ldrs/react'
+import 'ldrs/react/TailChase.css'
+
+const FinnaPage = () => {
+  const [messages, setMessages] = useState([]);
+  const [answer, setAnswer] = useState('');
+  const [currentResponse, setCurrentResponse] = useState(null);
+  const [sources, setSources] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+
+  const handleSendMessage = (text) => {
+    const newMessage = {
+      id: Date.now(),
+      text,
+      timestamp: new Date().toISOString(),
+    };  
+    setMessages([...messages, newMessage]);
+    setTimeout(() => {
+      setCurrentResponse({
+        id: Date.now() + 1,
+        text: text,
+        timestamp: new Date().toISOString(),
+      });
+    }, 500);
+  };
+
+  return (
+    <div className="finna-page">
+      <div className="finna-page-container">
+        <aside className="history-panel">
+          <h2>Chat History</h2>
+          <ChatHistory messages={messages} setCurrentResponse={setCurrentResponse}/>
+        </aside>
+        <main className="chat-panel">
+          {currentResponse && <ChatResponse response={currentResponse} answer={answer} sources={sources} />}
+          <div className="input-container">
+            <ChatInput 
+              onSendMessage={handleSendMessage} 
+              setSources={setSources} 
+              setIsLoading={setIsLoading} 
+              setIsError={setIsError}
+              isLoading={isLoading}
+            />
+          </div>
+          {isLoading && (
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '20px' }}>
+              <TailChase
+                size="40"
+                speed="1.75"
+                color="black"
+              />
+            </div>
+          )}
+          {isError && (
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px', marginBottom: '20px' }}>
+              <div className="error-message" style={{ color: 'red'}}>
+                  Une erreur s'est produite lors de la récupération des articles.
+              </div>
+            </div>
+          )}
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default FinnaPage;
