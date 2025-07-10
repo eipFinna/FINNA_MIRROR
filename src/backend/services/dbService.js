@@ -40,6 +40,70 @@ exports.getUserByEmail = async (email) => {
     return result.rows[0];
 }
 
+exports.findOrCreateGoogleUser = async (googleProfile) => {
+    const { id: googleId, emails } = googleProfile;
+    const email = emails && emails[0] ? emails[0].value : null;
+
+    // First, try to find existing user by Google ID
+    let query = `
+        SELECT "id", "email", "provider_id", "provider_name"
+        FROM "users"
+        WHERE "provider_id" = $1
+    `;
+    let result = await db.query(query, [googleId]);
+
+    if (result.rows.length > 0) {
+        return result.rows[0];
+    }
+
+    // If not found by Google ID, try by email
+    if (email) {
+        query = `
+            SELECT "id", "email", "provider_id", "provider_name"
+            FROM "users"
+            WHERE "email" = $1
+        `;
+        result = await db.query(query, [email]);
+
+        if (result.rows.length > 0) {
+            const updateQuery = `
+                UPDATE "users"
+                SET "provider_id" = $1, "provider_name" = $2
+                WHERE "email" = $3
+                RETURNING "id", "email", "provider_id", "provider_name"
+            `;
+            const updateResult = await db.query(updateQuery, [
+                googleId, 'google', email
+            ]);
+            return updateResult.rows[0];
+        }
+    }
+
+    // Create new user
+    const insertQuery = `
+        INSERT INTO "users" ("email", "provider_id", "provider_name")
+        VALUES ($1, $2, $3)
+        RETURNING "id", "email", "provider_id", "provider_name"
+    `;
+    const insertResult = await db.query(insertQuery, [
+        email, googleId, 'google'
+    ]);
+    return insertResult.rows[0];
+};
+
+exports.getUserById = async (id) => {
+    const query = `
+        SELECT "id", "email", "provider_id", "provider_name"
+        FROM "users"
+        WHERE "id" = $1
+    `;
+    const result = await db.query(query, [id]);
+    if (result.rows.length === 0) {
+        return null;
+    }
+    return result.rows[0];
+};
+
 /**
  * Recherche des articles pertinents via full-text search
  * @param {string} keywords — chaîne brute extraite de l'utilisateur
@@ -74,10 +138,17 @@ async function findArticlesByKeywords(keywordsArr, limit = 5) {
   // 2) fallback si aucun résultat
   let n = keywordsArr.length;
   while (results.length === 0 && n > 2) {
-    n -= 1;  // on réduit d’un mot
+    n -= 1;  // on réduit d'un mot
     results = await queryWithTerms(keywordsArr.slice(0, n), limit);
   }
   return results;
 }
 
-module.exports = { findArticlesByKeywords };
+module.exports = {
+    searchArticles: exports.searchArticles,
+    registerUserInDB: exports.registerUserInDB,
+    getUserByEmail: exports.getUserByEmail,
+    findOrCreateGoogleUser: exports.findOrCreateGoogleUser,
+    getUserById: exports.getUserById,
+    findArticlesByKeywords
+};
