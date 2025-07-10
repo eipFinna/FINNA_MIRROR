@@ -16,6 +16,8 @@ passport.use(new GoogleStrategy({
 }, (accessToken, refreshToken, profile, done) => {
   // Ici on peut créer ou récupérer l’utilisateur dans la base
   console.log('Google profile:', profile);
+  console.log('accessToken:', accessToken);
+  console.log('refreshToken:', refreshToken);
   return done(null, profile);
 }));
 
