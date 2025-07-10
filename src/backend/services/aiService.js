@@ -1,6 +1,6 @@
 const axios = require('axios');
 const { iaBatch } = require('../services/metricsService');
-const FLASK_URL = process.env.FLASK_URL || 'http://localhost:5000';
+const FLASK_URL = process.env.FLASK_URL || 'http://localhost:5001';
 
 // Extrait les mots-clés
 async function getKeywords(text) {

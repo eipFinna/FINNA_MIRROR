@@ -56,8 +56,8 @@ docker-compose up --build
 This command will build the Docker images for both the Node.js and Flask services and start the containers.
 
 ### Accessing the Application
-- The Node.js server will be accessible at `http://localhost:3001`.
-- The Flask API will be accessible at `http://localhost:5000`.
+- The Node.js server will be accessible at `http://localhost:5000`.
+- The Flask API will be accessible at `http://localhost:5001`.
 
 ### Usage
 - Use the `/search` endpoint to search for articles and get summaries.

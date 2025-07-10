@@ -91,7 +91,7 @@ useEffect(() => {
 async function analyseText() {
   setIsLoading(true);
   try {
-    const response = await fetch(`http://localhost:3001/search?q=${inputText}`);
+    const response = await fetch(`http://localhost:5000/search?q=${inputText}`);
     const json = await response.json();
     console.log(json);
     

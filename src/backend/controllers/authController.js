@@ -4,6 +4,6 @@ exports.googleAuth = (req, res) => {
   
   exports.googleAuthCallback = (req, res) => {
     // Redirige vers le frontend avec l’utilisateur loggé
-    res.redirect('http://localhost:3003/finna');
+    res.redirect('http://localhost:3000/finna');
   };
   
