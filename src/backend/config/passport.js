@@ -3,10 +3,6 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const dbService = require('../services/dbService');
 require('dotenv').config();
 
-console.log("coucou");
-console.log(process.env.GOOGLE_CLIENT_ID);
-console.log(process.env.GOOGLE_CLIENT_SECRET);
-
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
@@ -17,10 +13,7 @@ passport.use(new GoogleStrategy({
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     console.log('Google profile:', profile);
-    console.log('accessToken:', accessToken);
-    console.log('refreshToken:', refreshToken);
     
-    // Create or find user in database
     const user = await dbService.findOrCreateGoogleUser(profile);
     return done(null, user);
   } catch (error) {
@@ -30,7 +23,7 @@ passport.use(new GoogleStrategy({
 }));
 
 passport.serializeUser((user, done) => {
-  done(null, user.id); // Store only user ID in session
+  done(null, user.id);
 });
 
 passport.deserializeUser(async (id, done) => {
