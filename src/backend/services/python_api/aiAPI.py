@@ -75,35 +75,37 @@ STOPWORDS = {
     "ou", "où", "sa", "son", "ses", "mes", "tes", "nos", "votres",
     "leur", "leurs", "du", "au", "«", "»"
 }
-def extract_keywords(text: str, top_n: int = 5) -> list[str]:
+def extract_keywords(text: str, top_n: int = 10) -> list[str]:
     doc = nlp(text)
 
-    # 1. On extrait d'abord les PERSON (multi-mots conservés)
-    persons = [ent.text for ent in doc.ents if ent.label_ == "PER"]
+    # 1. Entités nommées pertinentes (personnes, lieux, organisations, événements)
+    entity_labels = {"PER", "LOC", "ORG", "GPE", "EVENT"}
+    entities = [ent.text for ent in doc.ents if ent.label_ in entity_labels]
 
-    # 2. On génère des lemmas pour les autres termes
-    words = [tok.lemma_.lower() for tok in doc
-             if not tok.is_stop
-             and tok.pos_ in {"NOUN","PROPN","VERB"}
-             and len(tok.lemma_) > 3]
+    # 2. Noms propres et communs, sans stopwords ni mots trop courts
+    words = [
+        tok.lemma_.lower()
+        for tok in doc
+        if not tok.is_stop
+        and tok.pos_ in {"NOUN", "PROPN"}
+        and len(tok.lemma_) > 3
+        and tok.lemma_.lower() not in STOPWORDS
+    ]
     counts = Counter(words)
 
-    # 3. On assemble en donnant la priorité aux personnes
+    # 3. On assemble en donnant la priorité aux entités nommées
     keywords = []
     used_lemmas = set()
-    # Ajoute les personnes et marque leurs tokens pour éviter les doublons
-    for name in persons:
+    for name in entities:
         name_lemmas = {tok.lemma_.lower() for tok in nlp(name)}
         if not any(l in used_lemmas for l in name_lemmas):
             keywords.append(name)
             used_lemmas.update(name_lemmas)
-    # Ajoute les autres mots-clés sans doublon de lemme
-    for w, _ in counts.most_common(top_n):
+    for w, _ in counts.most_common(top_n * 2):  # on élargit un peu la sélection
         if w not in used_lemmas and w not in (kw.lower() for kw in keywords):
             keywords.append(w)
             used_lemmas.add(w)
-    # 4. On tronque à top_n  
-    return keywords[:top_n]
+    return keywords
 
 
 def summarize_chunk(
@@ -138,7 +140,7 @@ def keywords_route():
     text = data.get("text", "")
     if not text or not isinstance(text, str):
         return jsonify({"error": 'Paramètre "text" manquant ou invalide'}), 400
-    keywords = extract_keywords(text, top_n=5)
+    keywords = extract_keywords(text)
     return jsonify({"keywords": keywords})
 
 
