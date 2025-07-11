@@ -141,7 +141,7 @@ async function analyseText() {
       <Box className="App-header">
         <Typography variant="h5">Finna</Typography>
       </Box>
-      <Box display="flex" flexDirection="column">
+      <Box display="flex" flexDirection="column" paddingBottom={2}>
         <Box
           display="flex"
           flexDirection="column"
