@@ -27,6 +27,7 @@ services:
       - backend-flask
     environment:
       - MODE=${MODE:-prod}
+      - FLASK_URL=http://backend-flask:5000
     command: >
       sh -c "if [ \"$MODE\" = \"dev\" ]; then npx nodemon app.js; else npm start; fi"
     networks:
