@@ -13,9 +13,9 @@ export const formatRelativeTime = (timestamp) => {
                          (date.getMonth() - now.getMonth());
     const diffInYears = diffInMonths / 12;
     
-    const formatter = new Intl.RelativeTimeFormat('en', { 
+    const formatter = new Intl.RelativeTimeFormat('fr', { 
         numeric: 'auto',
-        style: 'long' 
+        style: 'long'   
     });
 
     if (Math.abs(diffInSeconds) < 60) {
