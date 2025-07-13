@@ -44,7 +44,6 @@ exports.findOrCreateGoogleUser = async (googleProfile) => {
     const { id: googleId, emails } = googleProfile;
     const email = emails && emails[0] ? emails[0].value : null;
 
-    // First, try to find existing user by Google ID
     let query = `
         SELECT "id", "email", "provider_id", "provider_name"
         FROM "users"
@@ -56,7 +55,6 @@ exports.findOrCreateGoogleUser = async (googleProfile) => {
         return result.rows[0];
     }
 
-    // If not found by Google ID, try by email
     if (email) {
         query = `
             SELECT "id", "email", "provider_id", "provider_name"
@@ -79,7 +77,6 @@ exports.findOrCreateGoogleUser = async (googleProfile) => {
         }
     }
 
-    // Create new user
     const insertQuery = `
         INSERT INTO "users" ("email", "provider_id", "provider_name")
         VALUES ($1, $2, $3)

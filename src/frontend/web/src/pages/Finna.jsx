@@ -3,91 +3,32 @@ import { useNavigate } from 'react-router-dom';
 import ChatHistory from '../components/ChatHistory';
 import ChatInput from '../components/ChatInput';
 import ChatResponse from '../components/ChatResponse';
+import { useAuthRequired } from '../hooks/useAuth';
+import { authService } from '../services/authService';
 import './Finna.css';
 
 const FinnaPage = () => {
   const [messages, setMessages] = useState([]);
   const [currentResponse, setCurrentResponse] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  
+  const { isAuthenticated, user, isLoading, shouldRedirect, logout } = useAuthRequired('/login');
 
-  // Check authentication status on component mount
   useEffect(() => {
-    checkAuthStatus();
-  }, []);
-
-  const checkAuthStatus = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/auth/me', {
-        credentials: 'include' // Important: include cookies
-      });
-      const data = await response.json();
-      
-      if (data.authenticated) {
-        setIsAuthenticated(true);
-        setUser(data.user);
-      } else {
-        // Redirect to login if not authenticated
-        navigate('/login');
-        return;
-      }
-    } catch (error) {
-      console.error('Auth check failed:', error);
-      // Redirect to login on error
+    if (shouldRedirect) {
       navigate('/login');
-      return;
-    } finally {
-      setIsLoading(false);
     }
-  };
+  }, [shouldRedirect, navigate]);
 
   const handleLogout = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/auth/logout', {
-        method: 'POST',
-        credentials: 'include'
-      });
-      
-      if (response.ok) {
-        // Clear local state
-        setIsAuthenticated(false);
-        setUser(null);
-        setMessages([]);
-        setCurrentResponse(null);
-        
-        // Redirect to login page
-        navigate('/login');
-      } else {
-        console.error('Logout failed');
-      }
-    } catch (error) {
-      console.error('Logout error:', error);
-      // Even if logout request fails, clear local state and redirect
-      setIsAuthenticated(false);
-      setUser(null);
+    const result = await logout();
+    if (result.success) {
+      setMessages([]);
+      setCurrentResponse(null);
       navigate('/login');
-    }
-  };
-
-  const makeAuthenticatedRequest = async (url, options = {}) => {
-    try {
-      const response = await fetch(url, {
-        ...options,
-        credentials: 'include' // Include cookies for session
-      });
-      
-      if (response.status === 401) {
-        // Session expired or not authenticated - redirect to login
-        navigate('/login');
-        return null;
-      }
-      
-      return response;
-    } catch (error) {
-      console.error('Authenticated request failed:', error);
-      return null;
+    } else {
+      console.error('Logout failed:', result.error);
+      navigate('/login');
     }
   };
 
@@ -100,7 +41,6 @@ const FinnaPage = () => {
     
     setMessages([...messages, newMessage]);
 
-    // For search functionality, no auth required
     try {
       const response = await fetch(`http://localhost:5000/search?q=${encodeURIComponent(text)}`);
       const data = await response.json();
@@ -120,20 +60,19 @@ const FinnaPage = () => {
       });
     }
 
-    // Save to history for authenticated users
-    try {
-      await makeAuthenticatedRequest('http://localhost:5000/feedback', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          query: text,
-          timestamp: new Date().toISOString()
-        })
-      });
-    } catch (error) {
-      console.error('Failed to save to history:', error);
+    const result = await authService.makeAuthenticatedRequest('http://localhost:5000/feedback', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: text,
+        timestamp: new Date().toISOString()
+      })
+    });
+
+    if (!result.success && result.status === 401) {
+      navigate('/login');
     }
   };
 
@@ -145,14 +84,12 @@ const FinnaPage = () => {
     );
   }
 
-  // Only render if authenticated (after loading is complete)
   if (!isAuthenticated) {
-    return null; // Component will redirect, so return nothing
+    return null;
   }
 
   return (
     <div className="finna-page">
-      {/* Header with user info and logout */}
       <div className="finna-header">
         <div className="user-info">
           <span>Bienvenue, {user?.email}</span>

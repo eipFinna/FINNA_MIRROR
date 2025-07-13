@@ -1,9 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 import "./Header.css";
 
 const Header = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
 
   return (
     <header className="header">
@@ -16,12 +18,15 @@ const Header = () => {
         <a href="#download" className="cta-button">
           Télécharger Finna
         </a>
-        <button
-          className="login-button"
-          onClick={() => navigate("/login")}
-        >
-          Se connecter
-        </button>
+        {isAuthenticated ? (
+          <button className="login-button" onClick={() => navigate("/finna")}>
+            Accéder à Finna
+          </button>
+        ) : (
+          <button className="login-button" onClick={() => navigate("/login")}>
+            Se connecter
+          </button>
+        )}
       </div>
     </header>
   );

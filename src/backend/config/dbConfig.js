@@ -1,4 +1,4 @@
-require('dotenv').config(); // Add this line to load .env variables
+require('dotenv').config();
 const { Pool } = require('pg');
 
 const pool = new Pool({
@@ -13,7 +13,6 @@ const pool = new Pool({
   }
 });
 
-// Test the connection
 pool.connect((err, client, release) => {
   if (err) {
     console.error('Error acquiring client', err.stack);
@@ -25,5 +24,5 @@ pool.connect((err, client, release) => {
 
 module.exports = {
   query: (text, params) => pool.query(text, params),
-  pool: pool // Export pool for session store
+  pool: pool
 };

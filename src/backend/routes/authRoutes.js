@@ -2,7 +2,6 @@ const express = require('express');
 const passport = require('passport');
 const router = express.Router();
 
-// Google OAuth routes
 router.get('/google', 
   passport.authenticate('google', { scope: ['profile', 'email'] })
 );
@@ -10,12 +9,10 @@ router.get('/google',
 router.get('/google/callback', 
   passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
-    // Successful authentication
-    res.redirect('http://localhost:3000/finna'); // Redirect to your frontend
+    res.redirect('http://localhost:3000/finna');
   }
 );
 
-// Check if user is authenticated
 router.get('/me', (req, res) => {
   if (req.isAuthenticated()) {
     res.json({
@@ -31,7 +28,6 @@ router.get('/me', (req, res) => {
   }
 });
 
-// Logout
 router.post('/logout', (req, res) => {
   req.logout((err) => {
     if (err) {
