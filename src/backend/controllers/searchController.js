@@ -1,5 +1,5 @@
 // Handler API pour rechercher et résumer des articles
-const { findArticlesByKeywords } = require('../services/dbService');
+const { findArticlesByKeywords, saveUserSearch } = require('../services/dbService');
 const aiService = require('../services/aiService'); // getKeywords, summarizeArticle, summarizeAggregate
 const metricsService = require('../services/metricsService');
 
@@ -46,6 +46,7 @@ async function searchAndSummarize(query, maxArticles = parseInt(process.env.MAX_
 
     // → On recompose l’objet renvoyé
     const perArticleSummaries = articles.map((art, i) => ({
+      id: art.id,
       title: art.title,
       summary: summaries[i],
       date: art.date,
@@ -75,6 +76,13 @@ async function getSummarizedArticles(req, res, next) {
   try {
     const query = req.query.q || req.query.query || req.body.query;
     const result = await searchAndSummarize(query);
+    // On enregistre la recherche utilisateur
+    if (req.user && req.user.id) {
+      const userId = req.user.id;
+      const summary = result.summary;
+      const articles = result.articles;
+      await saveUserSearch(userId, query, summary, articles);
+    }
     res.json(result);
   } catch (err) {
     next(err);

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { searchArticles } from '../services/articleApi';
 
-function ChatInput({ onSendMessage, setSources, setIsLoading, setIsError, isLoading }) {
+function ChatInput({ onSendMessage, setSources, setIsLoading, setIsError, isLoading, user }) {
   const [message, setMessage] = useState('');
 
   const handleSubmit = (e) => {

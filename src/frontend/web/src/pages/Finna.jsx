@@ -115,6 +115,7 @@ const FinnaPage = () => {
                 setIsLoading={setIsSearchLoading} 
                 setIsError={setIsError}
                 isLoading={isSearchLoading}
+                user={user}
               />
             </div>
             {isSearchLoading && (

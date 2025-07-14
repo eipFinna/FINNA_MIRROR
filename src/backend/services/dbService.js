@@ -101,6 +101,25 @@ exports.getUserById = async (id) => {
     return result.rows[0];
 };
 
+exports.saveUserSearch = async (userId, searchQuery, summary, articles) => {
+
+    // mettre les id des articles dans une string au format x;x;x;
+    console.log('---------articles:', articles);
+    const articleIds = articles.map(a => a.id).join(';');
+
+    const query = `
+        INSERT INTO "user_research" ("user_id", "summary_article", "article_id", "user_research")
+        VALUES ($1, $2, $3, $4)
+        RETURNING "id"
+        `;
+    const values = [userId, summary, articleIds, searchQuery];
+    const result = await db.query(query, values);
+    if (result.rows.length === 0) {
+        throw new Error('Failed to save user search');
+    }
+    return result.rows[0].id;
+}
+
 /**
  * Recherche des articles pertinents via full-text search
  * @param {string} keywords — chaîne brute extraite de l'utilisateur
@@ -111,7 +130,7 @@ const MIN_SCORE = parseFloat(process.env.MIN_SCORE || '0.15');
 async function queryWithTerms(terms, limit) {
   const q = terms.join(' ');
   const sql = `
-    SELECT title, article, date, url,
+    SELECT id, title, article, date, url,
       ts_rank(
         setweight(to_tsvector('french', coalesce(title, '')), 'A')
         || setweight(tsv, 'B'),
@@ -147,5 +166,6 @@ module.exports = {
     getUserByEmail: exports.getUserByEmail,
     findOrCreateGoogleUser: exports.findOrCreateGoogleUser,
     getUserById: exports.getUserById,
+    saveUserSearch: exports.saveUserSearch,
     findArticlesByKeywords
 };
