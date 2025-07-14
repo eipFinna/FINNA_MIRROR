@@ -19,7 +19,7 @@ RUN python3 -m spacy download fr_core_news_lg
 RUN python3 export_onnx.py --model plguillou/t5-base-fr-sum-cnndm --output onnx-t5-base-fr-quant --quantize
 
 # Expose the port the app runs on
-EXPOSE 5000
+EXPOSE 5001
 
 # Command to run the Flask application
 CMD ["python3", "aiAPI.py"]

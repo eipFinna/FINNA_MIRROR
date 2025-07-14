@@ -1,25 +1,28 @@
+require('dotenv').config();
 const { Pool } = require('pg');
-const fs = require('fs');
-const path = require('path');
-
-const configPath = path.join(__dirname, 'dbConfig.json');
-const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 
 const pool = new Pool({
-    host: config.host,
-    user: config.user,
-    password: config.password,
-    database: config.database,
-    port: config.port,
-    ssl: {
-        rejectUnauthorized: config.ssl.rejectUnauthorized,
-        ca: config.ssl.ca,
-    },
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
+  ssl: {
+    rejectUnauthorized: true,
+    ca: process.env.DB_SSL_CA
+  }
 });
 
-pool.connect((err) => {
-    if (err) console.error('Erreur de connexion à PostgreSQL :', err.stack);
-    else console.log('Connecté à PostgreSQL');
+pool.connect((err, client, release) => {
+  if (err) {
+    console.error('Error acquiring client', err.stack);
+  } else {
+    console.log('Connected to PostgreSQL');
+    release();
+  }
 });
 
-module.exports = pool;
+module.exports = {
+  query: (text, params) => pool.query(text, params),
+  pool: pool
+};

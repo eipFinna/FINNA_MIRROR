@@ -9,6 +9,6 @@ COPY . .
 
 ARG MODE=prod
 
-EXPOSE 3001
+EXPOSE 5000
 
 CMD sh -c "if [ \"$MODE\" = \"dev\" ]; then npm start; else npm run build; fi"
