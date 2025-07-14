@@ -6,13 +6,19 @@ import ChatResponse from '../components/ChatResponse';
 import { useAuthRequired } from '../hooks/useAuth';
 import { authService } from '../services/authService';
 import './Finna.css';
+import { TailChase } from 'ldrs/react'
+import 'ldrs/react/TailChase.css'
 
 const FinnaPage = () => {
   const [messages, setMessages] = useState([]);
+  const [answer, setAnswer] = useState('');
   const [currentResponse, setCurrentResponse] = useState(null);
   const navigate = useNavigate();
-  
   const { isAuthenticated, user, isLoading, shouldRedirect, logout } = useAuthRequired('/login');
+  const [sources, setSources] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+
 
   useEffect(() => {
     if (shouldRedirect) {
@@ -37,8 +43,7 @@ const FinnaPage = () => {
       id: Date.now(),
       text,
       timestamp: new Date().toISOString(),
-    };
-    
+    };  
     setMessages([...messages, newMessage]);
 
     try {
@@ -56,6 +61,7 @@ const FinnaPage = () => {
       setCurrentResponse({
         id: Date.now() + 1,
         text: `Error searching for: "${text}"`,
+
         timestamp: new Date().toISOString(),
       });
     }
@@ -118,6 +124,38 @@ const FinnaPage = () => {
             </div>
           </main>
         </div>
+        <aside className="history-panel">
+          <h2>Chat History</h2>
+          <ChatHistory messages={messages} setCurrentResponse={setCurrentResponse}/>
+        </aside>
+        <main className="chat-panel">
+          {currentResponse && <ChatResponse response={currentResponse} answer={answer} sources={sources} />}
+          <div className="input-container">
+            <ChatInput 
+              onSendMessage={handleSendMessage} 
+              setSources={setSources} 
+              setIsLoading={setIsLoading} 
+              setIsError={setIsError}
+              isLoading={isLoading}
+            />
+          </div>
+          {isLoading && (
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '20px' }}>
+              <TailChase
+                size="40"
+                speed="1.75"
+                color="black"
+              />
+            </div>
+          )}
+          {isError && (
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px', marginBottom: '20px' }}>
+              <div className="error-message" style={{ color: 'red'}}>
+                  Une erreur s'est produite lors de la récupération des articles.
+              </div>
+            </div>
+          )}
+        </main>
       </div>
     </div>
   );
