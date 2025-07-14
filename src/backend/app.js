@@ -65,21 +65,6 @@ app.get('/', (req, res) => {
 app.use('/feedback', requireAuth, feedbackRoutes);
 app.use('/metrics', requireAuth, metricsRoutes);
 
-// Test session route
-app.get('/test-session', (req, res) => {
-    console.log('Session ID:', req.sessionID);
-    console.log('Session data:', req.session);
-    console.log('Is authenticated:', req.isAuthenticated());
-    console.log('User:', req.user);
-    
-    res.json({
-        sessionID: req.sessionID,
-        isAuthenticated: req.isAuthenticated(),
-        user: req.user,
-        session: req.session
-    });
-});
-
 app.listen(appConfig.port, () => {
     console.log(`Server running on port ${appConfig.port}`);
 });

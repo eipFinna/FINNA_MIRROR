@@ -13,12 +13,12 @@ const FinnaPage = () => {
   const [messages, setMessages] = useState([]);
   const [answer, setAnswer] = useState('');
   const [currentResponse, setCurrentResponse] = useState(null);
+  const [sources, setSources] = useState([]);
+  const [isSearchLoading, setIsSearchLoading] = useState(false); // Added this state
+  const [isError, setIsError] = useState(false);
+  
   const navigate = useNavigate();
   const { isAuthenticated, user, isLoading, shouldRedirect, logout } = useAuthRequired('/login');
-  const [sources, setSources] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
-
 
   useEffect(() => {
     if (shouldRedirect) {
@@ -45,40 +45,25 @@ const FinnaPage = () => {
       timestamp: new Date().toISOString(),
     };  
     setMessages([...messages, newMessage]);
+    setIsSearchLoading(true);
+    setIsError(false);
 
     try {
-      const response = await fetch(`http://localhost:5000/search?q=${encodeURIComponent(text)}`);
-      const data = await response.json();
-      
       setCurrentResponse({
         id: Date.now() + 1,
-        text: data.summary || `Search results for: "${text}"`,
+        text: text || `Search results for: "${text}"`,
         timestamp: new Date().toISOString(),
-        articles: data.articles || []
       });
     } catch (error) {
       console.error('Search failed:', error);
       setCurrentResponse({
         id: Date.now() + 1,
         text: `Error searching for: "${text}"`,
-
         timestamp: new Date().toISOString(),
       });
-    }
-
-    const result = await authService.makeAuthenticatedRequest('http://localhost:5000/feedback', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query: text,
-        timestamp: new Date().toISOString()
-      })
-    });
-
-    if (!result.success && result.status === 401) {
-      navigate('/login');
+      setIsError(true);
+    } finally {
+      setIsSearchLoading(false);
     }
   };
 
@@ -117,45 +102,39 @@ const FinnaPage = () => {
           
           <main className="chat-panel">
             {currentResponse && (
-              <ChatResponse response={currentResponse} />
+              <ChatResponse 
+                response={currentResponse} 
+                answer={answer} 
+                sources={sources} 
+              />
             )}
             <div className="input-container">
-              <ChatInput onSendMessage={handleSendMessage} />
-            </div>
-          </main>
-        </div>
-        <aside className="history-panel">
-          <h2>Chat History</h2>
-          <ChatHistory messages={messages} setCurrentResponse={setCurrentResponse}/>
-        </aside>
-        <main className="chat-panel">
-          {currentResponse && <ChatResponse response={currentResponse} answer={answer} sources={sources} />}
-          <div className="input-container">
-            <ChatInput 
-              onSendMessage={handleSendMessage} 
-              setSources={setSources} 
-              setIsLoading={setIsLoading} 
-              setIsError={setIsError}
-              isLoading={isLoading}
-            />
-          </div>
-          {isLoading && (
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '20px' }}>
-              <TailChase
-                size="40"
-                speed="1.75"
-                color="black"
+              <ChatInput 
+                onSendMessage={handleSendMessage} 
+                setSources={setSources} 
+                setIsLoading={setIsSearchLoading} 
+                setIsError={setIsError}
+                isLoading={isSearchLoading}
               />
             </div>
-          )}
-          {isError && (
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px', marginBottom: '20px' }}>
-              <div className="error-message" style={{ color: 'red'}}>
-                  Une erreur s'est produite lors de la récupération des articles.
+            {isSearchLoading && (
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '20px' }}>
+                <TailChase
+                  size="40"
+                  speed="1.75"
+                  color="black"
+                />
               </div>
-            </div>
-          )}
-        </main>
+            )}
+            {isError && (
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px', marginBottom: '20px' }}>
+                <div className="error-message" style={{ color: 'red'}}>
+                    Une erreur s'est produite lors de la récupération des articles.
+                </div>
+              </div>
+            )}
+          </main>
+        </div>
       </div>
     </div>
   );
