@@ -87,7 +87,7 @@ def extract_keywords(text: str, top_n: int = 10) -> list[str]:
         tok.lemma_.lower()
         for tok in doc
         if not tok.is_stop
-        and tok.pos_ in {"NOUN", "PROPN"}
+        and tok.pos_ in {"NOUN", "PROPN", "ADJ"}
         and len(tok.lemma_) > 3
         and tok.lemma_.lower() not in STOPWORDS
     ]
