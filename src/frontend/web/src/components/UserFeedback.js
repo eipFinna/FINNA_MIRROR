@@ -8,7 +8,7 @@ const UserFeedback = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    fetch("http://localhost:3001/feedback", {
+    fetch("http://localhost:5000/feedback", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

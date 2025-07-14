@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile.flask
     container_name: finna_backend_flask
     ports:
-      - "5000:5000"
+      - "5001:5001"
     env_file:
       - ./src/backend/.env
     networks:
@@ -17,7 +17,7 @@ services:
       dockerfile: Dockerfile.node
     container_name: finna_backend_node
     ports:
-      - "3001:3001"
+      - "5000:5000"
     env_file:
       - ./src/backend/.env
     volumes:
@@ -27,7 +27,7 @@ services:
       - backend-flask
     environment:
       - MODE=${MODE:-prod}
-      - FLASK_URL=http://backend-flask:5000
+      - FLASK_URL=http://backend-flask:5001
     command: >
       sh -c "if [ \"$MODE\" = \"dev\" ]; then npx nodemon app.js; else npm start; fi"
     networks:
@@ -61,7 +61,7 @@ services:
       - /app/node_modules
       - ./src/frontend/extension/build:/app/build
     ports:
-      - "3002:3000"
+      - "3003:3003"
     environment:
       - MODE=${MODE:-prod}
     command: >

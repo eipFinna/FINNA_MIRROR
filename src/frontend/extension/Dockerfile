@@ -9,6 +9,8 @@ COPY . .
 
 ARG MODE=prod
 
+EXPOSE 3003
+
 # Build en prod uniquement
 RUN if [ "$MODE" = "prod" ]; then npm run build; fi
 

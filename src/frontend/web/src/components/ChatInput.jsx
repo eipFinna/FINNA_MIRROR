@@ -43,7 +43,7 @@ function ChatInput({ onSendMessage, setSources, setIsLoading, setIsError, isLoad
         />
         <button 
           type="submit" 
-          className={`send-button ${isLoading ? 'loading' : ''}`}
+          className="send-button"
           disabled={isLoading || !message.trim()}
           style={{
             backgroundColor: isLoading ? '#6c757d' : '',

@@ -68,6 +68,7 @@ function RegisterForm() {
       registerUser(formData.email, formData.password)
         .then(response => {
           console.log('Utilisateur enregistré avec succès :', response);
+          navigate('/finna');
         })
         .catch(error => {
           console.error('Erreur lors de l\'enregistrement :', error);
