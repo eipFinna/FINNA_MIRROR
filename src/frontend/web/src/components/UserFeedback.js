@@ -4,12 +4,12 @@ import "./UserFeedback.css";
 const UserFeedback = () => {
   const [email, setEmail] = useState("");
   const [feedback, setFeedback] = useState("");
-  const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:5000';
+  const REACT_APP_API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    fetch(API_BASE_URL + "/feedback", {
+    fetch(REACT_APP_API_BASE_URL + "/feedback", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

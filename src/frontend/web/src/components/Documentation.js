@@ -41,7 +41,7 @@ const Documentation = () => {
             Pour garantir une expérience optimale, Finna s'appuie sur des technologies modernes :
           </p>
           <ul>
-            <li>MySQL pour la base de données</li>
+            <li>PostGres pour la base de données</li>
             <li>React pour le front-end</li>
             <li>Node.js pour le serveur back-end</li>
             <li>Python pour le scraping de données</li>

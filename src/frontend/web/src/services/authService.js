@@ -1,10 +1,12 @@
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:5000';
+const REACT_APP_API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
+
+console.log('REACT_APP_API_BASE_URL:', REACT_APP_API_BASE_URL);
 
 export const authService = {
   // Check if user is authenticated
   checkAuthStatus: async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/me`, {
+      const response = await fetch(`${REACT_APP_API_BASE_URL}/auth/me`, {
         credentials: 'include'
       });
       const data = await response.json();
@@ -27,7 +29,7 @@ export const authService = {
   // Login user
   login: async (email, password) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/login`, {
+      const response = await fetch(`${REACT_APP_API_BASE_URL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -58,7 +60,7 @@ export const authService = {
   // Logout user
   logout: async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+      const response = await fetch(`${REACT_APP_API_BASE_URL}/auth/logout`, {
         method: 'POST',
         credentials: 'include'
       });

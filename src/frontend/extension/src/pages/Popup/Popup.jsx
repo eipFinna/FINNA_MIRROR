@@ -33,7 +33,7 @@ function StyledButton({ width, children, ...props }) {
   );
 }
 
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:5000';
+const REACT_APP_API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
 
 const Popup = () => {
   const [text, setText] = useState('');
@@ -96,7 +96,7 @@ async function analyseText() {
   setIsLoading(true);
   setError(false);
   try {
-    const response = await fetch(API_BASE_URL + `/search?q=${inputText}`);
+    const response = await fetch(REACT_APP_API_BASE_URL + `/search?q=${inputText}`);
     const json = await response.json();
     console.log(json);
 
