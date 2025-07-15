@@ -39,7 +39,7 @@ app.use(session({
     secure: false, // Set to true in production with HTTPS
     httpOnly: true,
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-    sameSite: 'lax',
+    // sameSite: 'lax',
   }
 }));
 

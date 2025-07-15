@@ -9,7 +9,7 @@ router.get('/google',
 router.get('/google/callback', 
   passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
-    res.redirect('http://localhost:3000/finna');
+    res.redirect('http://finna.ddns.net:3000/finna');
   }
 );
 
@@ -37,7 +37,7 @@ router.post('/logout', (req, res) => {
       if (err) {
         return res.status(500).json({ error: 'Session destruction failed' });
       }
-      res.clearCookie('connect.sid'); // Clear session cookie
+      res.clearCookie('finna.sid'); // Clear session cookie
       res.json({ message: 'Logged out successfully' });
     });
   });
