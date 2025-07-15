@@ -37,26 +37,6 @@ function ChatHistory({ searchHistory, setCurrentResponse, onRefresh, isLoading, 
 
     return (
         <div className="chat-history">
-            <div className="history-header">
-                <div className="search-history-input">
-                    <input
-                        type="text"
-                        placeholder="Rechercher dans l'historique..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="history-search-input"
-                    />
-                </div>
-                <button 
-                    onClick={handleRefresh}
-                    className="refresh-history-btn"
-                    title="Actualiser l'historique"
-                    disabled={isLoading}
-                >
-                    {isLoading ? '⟳' : '↻'}
-                </button>
-            </div>
-
             {isLoading ? (
                 <div className="history-loading">Chargement de l'historique...</div>
             ) : filteredHistory.length === 0 ? (
