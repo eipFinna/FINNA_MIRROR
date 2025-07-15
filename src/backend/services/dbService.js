@@ -111,7 +111,7 @@ const MIN_SCORE = parseFloat(process.env.MIN_SCORE || '0.15');
 async function queryWithTerms(terms, limit) {
   const q = terms.join(' ');
   const sql = `
-    SELECT title, article, date, url,
+    SELECT id, title, article, date, url,
       ts_rank(
         setweight(to_tsvector('french', coalesce(title, '')), 'A')
         || setweight(tsv, 'B'),

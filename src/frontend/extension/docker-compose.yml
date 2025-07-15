@@ -10,7 +10,7 @@ services:
       - /app/node_modules
       - ./build:/app/build
     ports:
-      - "3000:3000"
+      - "3003:3003"
     environment:
       - MODE=${MODE:-prod}
     command: >

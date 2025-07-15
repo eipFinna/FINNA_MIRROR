@@ -42,6 +42,7 @@ const Popup = () => {
   const [articleLength, setArticleLength] = useState(0);
   const [articles, setArticles] = useState([]);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [error, setError] = useState(false);
 
   // Load all saved data when the extension opens
 useEffect(() => {
@@ -90,11 +91,12 @@ useEffect(() => {
 
 async function analyseText() {
   setIsLoading(true);
+  setError(false);
   try {
     const response = await fetch(`http://localhost:5000/search?q=${inputText}`);
     const json = await response.json();
     console.log(json);
-    
+
     if (!json || !json.summary || !json.articles || json.articles.length === 0) {
       setText('Aucun résultat trouvé.');
       setArticles([]);
@@ -108,11 +110,17 @@ async function analyseText() {
     setLink(json.articles[0].url);
     setDate(format(new Date(json.articles[0].date), 'dd/MM/yyyy'));
     setArticleLength(json.articles.length);
-    
+
     saveResults(json);
-    
+
     chrome.storage.local.remove(['tmpText', 'selectedText']);
   } catch (error) {
+    setError(true);
+    setText('');
+    setArticles([]);
+    setLink('');
+    setDate('');
+    setArticleLength(0);
     console.error('Error fetching results:', error);
   } finally {
     setIsLoading(false);
@@ -136,12 +144,13 @@ async function analyseText() {
     ]);
   };
 
+
   return (
     <Box className="App">
       <Box className="App-header">
         <Typography variant="h5">Finna</Typography>
       </Box>
-      <Box display="flex" flexDirection="column">
+      <Box display="flex" flexDirection="column" paddingBottom={2}>
         <Box
           display="flex"
           flexDirection="column"
@@ -161,8 +170,12 @@ async function analyseText() {
             sx={{ width: '90%', backgroundColor: 'white' }}
           />
           <Box display="flex" width="90%" gap={2}>
-            <StyledButton width="100%" onClick={analyseText}>
-              Vérifier
+            <StyledButton width="100%" onClick={analyseText} disabled={isLoading}>
+              {isLoading ? (
+                <img src={loadingGif} width="24px" alt="loading" />
+              ) : (
+                'Vérifier'
+              )}
             </StyledButton>
           </Box>
         </Box>
@@ -173,7 +186,20 @@ async function analyseText() {
           justifyContent="center"
           gap={2}
         >
-          {isLoading && <img src={loadingGif} width="64px" alt="loading" />}
+          {error && (
+            <Box
+              width="90%"
+              bgcolor="#ffeaea"
+              border="1px solid #ff4d4f"
+              borderRadius={2}
+              padding={2}
+              mb={1}
+            >
+              <Typography color="#ff4d4f">
+                Une erreur est survenue, veuillez reessayer plus tard
+              </Typography>
+            </Box>
+          )}
           {text &&
           <Box
             display={'flex'}

@@ -46,6 +46,7 @@ async function searchAndSummarize(query, maxArticles = parseInt(process.env.MAX_
 
     // → On recompose l’objet renvoyé
     const perArticleSummaries = articles.map((art, i) => ({
+      id: art.id,
       title: art.title,
       summary: summaries[i],
       date: art.date,
