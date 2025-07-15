@@ -1,7 +1,7 @@
 const REACT_APP_API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
 
 export const registerUser = async (email, password) =>
-  fetch(REACT_APP_API_BASE_URL + '/register', {
+  fetch('/register', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -10,7 +10,7 @@ export const registerUser = async (email, password) =>
   }).then(res => res.json());
 
 export const loginUser = async (email, password) =>
-  fetch(REACT_APP_API_BASE_URL + '/login', {
+  fetch('/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),

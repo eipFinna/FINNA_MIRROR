@@ -6,7 +6,7 @@ export const authService = {
   // Check if user is authenticated
   checkAuthStatus: async () => {
     try {
-      const response = await fetch(`${REACT_APP_API_BASE_URL}/auth/me`, {
+      const response = await fetch(`/auth/me`, {
         credentials: 'include'
       });
       const data = await response.json();
@@ -29,7 +29,7 @@ export const authService = {
   // Login user
   login: async (email, password) => {
     try {
-      const response = await fetch(`${REACT_APP_API_BASE_URL}/login`, {
+      const response = await fetch(`/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ export const authService = {
   // Logout user
   logout: async () => {
     try {
-      const response = await fetch(`${REACT_APP_API_BASE_URL}/auth/logout`, {
+      const response = await fetch(`/auth/logout`, {
         method: 'POST',
         credentials: 'include'
       });

@@ -18,7 +18,7 @@ const app = express();
 require('dotenv').config();
 
 app.use(cors({
-  origin: 'http://localhost:3000', // Your frontend URL
+  origin: true, // Your frontend URL
   credentials: true // Important: allow cookies
 }));
 app.use(express.json());
@@ -33,10 +33,13 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'supersecret',
   resave: false,
   saveUninitialized: false,
+  rolling: true,
+  name: 'finna.sid',
   cookie: {
     secure: false, // Set to true in production with HTTPS
     httpOnly: true,
-    maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    sameSite: 'lax',
   }
 }));
 
