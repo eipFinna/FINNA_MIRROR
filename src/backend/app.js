@@ -7,6 +7,7 @@ const feedbackRoutes = require('./routes/feedbackRoutes');
 const registerRoutes = require('./routes/registerRoutes');
 const loginRoutes = require('./routes/loginRoutes');
 const metricsRoutes = require('./routes/metricsRoutes');
+const pastUserSearchRoutes = require('./routes/pastUserSearchRoutes');
 
 const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
@@ -59,14 +60,15 @@ app.use('/search', searchRoutes); // Keep search public
 app.use('/auth', authRoutes); // Auth routes (Google OAuth)
 app.use('/register', registerRoutes); // Keep registration public
 app.use('/login', loginRoutes); // Keep login public but update controller
+app.use('/feedback', feedbackRoutes);
+app.use('/metrics', metricsRoutes);
 
 app.get('/', (req, res) => {
     res.send('Welcome to the backend API');
 });
 
 // Protected routes (authentication required)
-app.use('/feedback', requireAuth, feedbackRoutes);
-app.use('/metrics', requireAuth, metricsRoutes);
+app.use('/userSearches', requireAuth, pastUserSearchRoutes)
 
 app.listen(appConfig.port, () => {
     console.log(`Server running on port ${appConfig.port}`);

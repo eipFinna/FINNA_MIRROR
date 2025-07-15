@@ -9,7 +9,6 @@ function genericOnClick(info) {
     chrome.storage.local.set({ selectedText: selectedText }, function () {
       console.log("Selected text saved:", selectedText);
 
-    chrome.runtime.openOptionsPage();
     });
   }}
 chrome.runtime.onInstalled.addListener(function () {

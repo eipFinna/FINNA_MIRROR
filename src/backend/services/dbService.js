@@ -101,6 +101,94 @@ exports.getUserById = async (id) => {
     return result.rows[0];
 };
 
+exports.saveUserSearch = async (userId, searchQuery, summary, articles) => {
+
+    // mettre les id des articles dans une string au format x;x;x;
+    console.log('---------articles:', articles);
+    const articleIds = articles.map(a => a.id).join(';');
+
+    const query = `
+        INSERT INTO "user_research" ("user_id", "summary_article", "article_id", "user_research")
+        VALUES ($1, $2, $3, $4)
+        RETURNING "id"
+        `;
+    const values = [userId, summary, articleIds, searchQuery];
+    const result = await db.query(query, values);
+    if (result.rows.length === 0) {
+        throw new Error('Failed to save user search');
+    }
+    return result.rows[0].id;
+}
+
+exports.userSearchArticles = async(userId) => {
+    const query = `
+        SELECT "user_research", "summary_article", "article_id", "created_at"
+        FROM "user_research"
+        WHERE "user_id" = $1
+        ORDER BY "created_at" DESC
+        `;
+    const values = [userId];
+    const searchResult = await db.query(query, values);
+    
+    if (searchResult.rows.length === 0) {
+        return {
+            searches: [],
+            articles: []
+        };
+    }
+    
+    // Get all unique article IDs from all searches
+    const allArticleIds = searchResult.rows
+        .map(row => row.article_id.split(';').filter(id => id && id.trim()))
+        .flat()
+        .map(id => parseInt(id.trim()))
+        .filter(id => !isNaN(id));
+    
+    const uniqueArticleIds = [...new Set(allArticleIds)];
+    
+    let articlesMap = new Map();
+    
+    if (uniqueArticleIds.length > 0) {
+        const articlesQuery = `
+            SELECT "id", "title", "article", "date", "url", "provider"
+            FROM "article_tab"
+            WHERE "id" = ANY($1::int[])
+            ORDER BY "date" DESC
+        `;
+        const articlesResult = await db.query(articlesQuery, [uniqueArticleIds]);
+        
+        // Create a map for quick article lookup
+        articlesResult.rows.forEach(article => {
+            articlesMap.set(article.id, article);
+        });
+    }
+    
+    // Process each search and attach its related articles
+    const searchesWithArticles = searchResult.rows.map(search => {
+        const articleIds = search.article_id
+            .split(';')
+            .filter(id => id && id.trim())
+            .map(id => parseInt(id.trim()))
+            .filter(id => !isNaN(id));
+        
+        const relatedArticles = articleIds
+            .map(id => articlesMap.get(id))
+            .filter(article => article); // Remove undefined articles
+        
+        return {
+            user_research: search.user_research,
+            summary_article: search.summary_article,
+            article_id: search.article_id,
+            created_at: search.created_at,
+            articles: relatedArticles // Add articles array to each search
+        };
+    });
+    
+    return {
+        searches: searchesWithArticles
+    };
+}
+
 /**
  * Recherche des articles pertinents via full-text search
  * @param {string} keywords — chaîne brute extraite de l'utilisateur
@@ -147,5 +235,7 @@ module.exports = {
     getUserByEmail: exports.getUserByEmail,
     findOrCreateGoogleUser: exports.findOrCreateGoogleUser,
     getUserById: exports.getUserById,
+    saveUserSearch: exports.saveUserSearch,
+    userSearchArticles: exports.userSearchArticles,
     findArticlesByKeywords
 };
