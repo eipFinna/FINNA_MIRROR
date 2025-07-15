@@ -46,6 +46,8 @@ services:
       - "3000:3000"
     environment:
       - MODE=${MODE:-prod}
+    env_file:
+      - ./src/frontend/web/.env
     command: >
       sh -c "if [ \"$MODE\" = \"dev\" ]; then npm start; else sh; fi"
     networks:
@@ -64,6 +66,8 @@ services:
       - "3003:3003"
     environment:
       - MODE=${MODE:-prod}
+    env_file:
+      - ./src/frontend/extension/.env
     command: >
       sh -c "if [ \"$MODE\" = \"dev\" ]; then npm start; else sh; fi"
     networks:

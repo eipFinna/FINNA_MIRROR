@@ -33,6 +33,8 @@ function StyledButton({ width, children, ...props }) {
   );
 }
 
+const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:5000';
+
 const Popup = () => {
   const [text, setText] = useState('');
   const [inputText, setInputText] = useState('');
@@ -43,6 +45,7 @@ const Popup = () => {
   const [articles, setArticles] = useState([]);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [error, setError] = useState(false);
+
 
   // Load all saved data when the extension opens
 useEffect(() => {
@@ -93,7 +96,7 @@ async function analyseText() {
   setIsLoading(true);
   setError(false);
   try {
-    const response = await fetch(`http://localhost:5000/search?q=${inputText}`);
+    const response = await fetch(API_BASE_URL + `/search?q=${inputText}`);
     const json = await response.json();
     console.log(json);
 

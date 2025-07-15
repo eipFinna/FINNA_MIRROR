@@ -2,9 +2,9 @@
   "name": "finna",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:5000",
   "dependencies": {
     "@testing-library/user-event": "^13.5.0",
+    "dotenv": "^17.2.0",
     "ldrs": "^1.1.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

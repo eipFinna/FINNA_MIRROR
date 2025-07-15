@@ -13,5 +13,7 @@ services:
       - "3003:3003"
     environment:
       - MODE=${MODE:-prod}
+    env_file:
+      - .env
     command: >
       sh -c "if [ \"$MODE\" = \"dev\" ]; then npm start; else sh; fi"

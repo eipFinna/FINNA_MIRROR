@@ -5,11 +5,12 @@ require('dotenv').config();
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:5000';
 
 passport.use(new GoogleStrategy({
   clientID: GOOGLE_CLIENT_ID,
   clientSecret: GOOGLE_CLIENT_SECRET,
-  callbackURL: 'http://localhost:5000/auth/google/callback',
+  callbackURL: API_BASE_URL + '/auth/google/callback',
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     console.log('Google profile:', profile);
