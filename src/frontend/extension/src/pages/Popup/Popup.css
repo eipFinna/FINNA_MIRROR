@@ -7,15 +7,6 @@
   --light-gray: #f0f0f0;
 }
 
-
-
-
-
-
-
-
-
-
 .dot-spinner {
   display: inline-block;
   position: relative;
@@ -61,14 +52,6 @@
     opacity: 1;
   }
 }
-
-
-
-
-
-
-
-
 
 .App {
   text-align: left;
