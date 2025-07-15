@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { searchArticles } from '../services/articleApi';
 
-function ChatInput({ onSendMessage, setSources, setIsLoading, setIsError, isLoading, user }) {
+function ChatInput({ onSendMessage, setSources, setIsLoading, setIsError, isLoading, setCurrentQuery }) {
   const [message, setMessage] = useState('');
 
   const handleSubmit = (e) => {
@@ -19,6 +19,7 @@ function ChatInput({ onSendMessage, setSources, setIsLoading, setIsError, isLoad
         setIsLoading(false);
         if (message.trim()) {
           setSources(response.articles);
+          setCurrentQuery(message.trim());
           onSendMessage(response.summary);
           setMessage('');
         }

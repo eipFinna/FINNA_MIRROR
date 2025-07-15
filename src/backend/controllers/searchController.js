@@ -77,7 +77,7 @@ async function getSummarizedArticles(req, res, next) {
     const query = req.query.q || req.query.query || req.body.query;
     const result = await searchAndSummarize(query);
     // On enregistre la recherche utilisateur
-    if (req.user && req.user.id) {
+    if (req.user && req.user.id && result.summary != "Aucun article pertinent trouvé.") {
       const userId = req.user.id;
       const summary = result.summary;
       const articles = result.articles;

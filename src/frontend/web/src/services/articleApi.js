@@ -11,3 +11,17 @@ export const searchArticles = async (query, userId) => {
     }
     return response.json();
 };
+
+export const getPastUserSearches = async (userId) => {
+    const response = await fetch(`/userSearches?userId=${userId}`, { // Fixed: removed body from GET request
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include' // Added for authentication
+    });
+    if (!response.ok) {
+        throw new Error('Failed to fetch past user searches');
+    }
+    return response.json();
+}

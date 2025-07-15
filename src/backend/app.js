@@ -7,6 +7,7 @@ const feedbackRoutes = require('./routes/feedbackRoutes');
 const registerRoutes = require('./routes/registerRoutes');
 const loginRoutes = require('./routes/loginRoutes');
 const metricsRoutes = require('./routes/metricsRoutes');
+const pastUserSearchRoutes = require('./routes/pastUserSearchRoutes');
 
 const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
@@ -64,6 +65,7 @@ app.get('/', (req, res) => {
 // Protected routes (authentication required)
 app.use('/feedback', requireAuth, feedbackRoutes);
 app.use('/metrics', requireAuth, metricsRoutes);
+app.use('/userSearches', requireAuth, pastUserSearchRoutes)
 
 app.listen(appConfig.port, () => {
     console.log(`Server running on port ${appConfig.port}`);
